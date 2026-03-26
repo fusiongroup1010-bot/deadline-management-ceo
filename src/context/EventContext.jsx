@@ -12,14 +12,12 @@ export const DEPARTMENTS = {
     { id: 'hn-pur', name: 'Purchasing', color: '#ede9fe', text: '#5b21b6', accent: '#8b5cf6' },
     { id: 'hn-hr', name: 'HR', color: '#fae8ff', text: '#86198f', accent: '#d946ef' },
     { id: 'hn-log', name: 'Logistics', color: '#f1f5f9', text: '#334155', accent: '#64748b' },
-    { id: 'hn-sm', name: 'Shop Manager', color: '#fff1f2', text: '#9f1239', accent: '#f43f5e' },
   ],
   hcm: [
     { id: 'hcm-bm', name: 'Branch Manager', color: '#dbeafe', text: '#1e40af', accent: '#3b82f6' },
     { id: 'hcm-log', name: 'Logistics', color: '#f1f5f9', text: '#334155', accent: '#64748b' },
     { id: 'hcm-mkt', name: 'MKT', color: '#e0f2fe', text: '#075985', accent: '#0ea5e9' },
     { id: 'hcm-hr', name: 'HR', color: '#fae8ff', text: '#86198f', accent: '#d946ef' },
-    { id: 'hcm-sm', name: 'Shop Manager', color: '#fff1f2', text: '#9f1239', accent: '#f43f5e' },
   ]
 };
 

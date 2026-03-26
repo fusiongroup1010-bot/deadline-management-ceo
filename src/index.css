@@ -923,7 +923,13 @@ button {
 
   .top-nav {
     padding: 0 16px !important;
-    height: 64px !important;
+    height: auto !important;
+    min-height: 64px !important;
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: stretch !important;
   }
 
   .content-area {
