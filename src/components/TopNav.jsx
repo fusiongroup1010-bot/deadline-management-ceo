@@ -35,34 +35,43 @@ const TopNav = ({ onMenuClick }) => {
           borderRadius: '14px',
           border: '1px solid var(--border-light)',
           boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)',
-          flex: 1, // Allow it to expand
+          flex: 1, 
           overflow: 'hidden'
         }}>
-          {['hanoi', 'hcm', 'hungyen'].filter(loc => currentUser?.allowedLocations?.includes(loc)).map((loc, index, arr) => (
-            <React.Fragment key={loc}>
-              {index > 0 && <div style={{ width: '1px', background: 'var(--border-light)', height: '20px', alignSelf: 'center' }} />}
-              <button
-                onClick={() => setActiveLocation(loc)}
-                style={{
-                  flex: 1, 
-                  padding: '8px 12px',
-                  borderRadius: '10px',
-                  fontSize: '13px',
-                  fontWeight: '800',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.4px',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  background: activeLocation === loc ? 'var(--primary-accent)' : 'transparent',
-                  color: activeLocation === loc ? 'white' : 'var(--text-muted)',
-                  boxShadow: activeLocation === loc ? '0 4px 12px rgba(96, 165, 250, 0.3)' : 'none',
-                  cursor: currentUser?.allowedLocations?.length > 1 ? 'pointer' : 'default',
-                  whiteSpace: 'nowrap'
-                }}
-              >
-                {loc}
-              </button>
-            </React.Fragment>
-          ))}
+          {['hanoi', 'hcm', 'hungyen'].filter(loc => currentUser?.allowedLocations?.includes(loc)).map((loc, index, arr) => {
+            const colors = {
+              hanoi: { bg: 'var(--primary-accent)', shadow: 'rgba(96, 165, 250, 0.3)' },
+              hcm: { bg: 'var(--pink-accent)', shadow: 'rgba(244, 114, 182, 0.3)' },
+              hungyen: { bg: '#8b5cf6', shadow: 'rgba(139, 92, 246, 0.3)' }
+            };
+            const isActive = activeLocation === loc;
+
+            return (
+              <React.Fragment key={loc}>
+                {index > 0 && <div style={{ width: '1px', background: 'var(--border-light)', height: '20px', alignSelf: 'center' }} />}
+                <button
+                  onClick={() => setActiveLocation(loc)}
+                  style={{
+                    flex: 1, 
+                    padding: '8px 12px',
+                    borderRadius: '10px',
+                    fontSize: '13px',
+                    fontWeight: '800',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.4px',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    background: isActive ? colors[loc].bg : 'transparent',
+                    color: isActive ? 'white' : 'var(--text-muted)',
+                    boxShadow: isActive ? `0 4px 12px ${colors[loc].shadow}` : 'none',
+                    cursor: currentUser?.allowedLocations?.length > 1 ? 'pointer' : 'default',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {loc}
+                </button>
+              </React.Fragment>
+            );
+          })}
         </div>
 
         <div className="soft-panel" style={{ display: 'none', alignItems: 'center', padding: '12px 20px', borderRadius: 'var(--radius-full)', width: '340px', gap: '12px', background: 'var(--bg-panel)' }}>
