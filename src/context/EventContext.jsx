@@ -48,8 +48,18 @@ export const EventProvider = ({ children }) => {
   const [items, setItems] = useState([]); // Real-time sync
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(null);
-  const [activeLocation, setActiveLocation] = useState('hanoi');
   const { currentUser } = useAuth();
+  const [activeLocation, setActiveLocation] = useState('hanoi');
+
+  // Auto-set location based on user permissions on login
+  useEffect(() => {
+    if (currentUser && currentUser.allowedLocations) {
+      // If current activeLocation isn't allowed for this user, switch to the first allowed one
+      if (!currentUser.allowedLocations.includes(activeLocation)) {
+        setActiveLocation(currentUser.allowedLocations[0]);
+      }
+    }
+  }, [currentUser]);
 
   // Sync with Firestore
   useEffect(() => {

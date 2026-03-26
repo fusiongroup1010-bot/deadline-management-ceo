@@ -21,7 +21,7 @@ const TopNav = ({ onMenuClick }) => {
       </button>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: 1 }}>
-        {/* Location Switcher Tabs */}
+        {/* Location Switcher Tabs - Filtered by user permissions */}
         <div style={{ 
           display: 'flex', 
           background: 'var(--bg-main)', 
@@ -30,7 +30,7 @@ const TopNav = ({ onMenuClick }) => {
           border: '1px solid var(--border-light)',
           boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
         }}>
-          {['hanoi', 'hcm'].map(loc => (
+          {['hanoi', 'hcm'].filter(loc => currentUser?.allowedLocations?.includes(loc)).map(loc => (
             <button
               key={loc}
               onClick={() => setActiveLocation(loc)}
@@ -44,7 +44,8 @@ const TopNav = ({ onMenuClick }) => {
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 background: activeLocation === loc ? 'var(--primary-accent)' : 'transparent',
                 color: activeLocation === loc ? 'white' : 'var(--text-muted)',
-                boxShadow: activeLocation === loc ? '0 4px 12px rgba(96, 165, 250, 0.3)' : 'none'
+                boxShadow: activeLocation === loc ? '0 4px 12px rgba(96, 165, 250, 0.3)' : 'none',
+                cursor: currentUser?.allowedLocations?.length > 1 ? 'pointer' : 'default'
               }}
             >
               {loc}
