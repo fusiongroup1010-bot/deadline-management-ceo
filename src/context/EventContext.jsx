@@ -20,7 +20,7 @@ export const DEPARTMENTS = {
     { id: 'hcm-hr', name: 'HR', color: '#fae8ff', text: '#86198f', accent: '#d946ef' },
   ],
   hungyen: [
-    { id: 'hy-fd', name: 'Front Desk', color: '#dbeafe', text: '#1e40af', accent: '#3b82f6' },
+    { id: 'hy-fd', name: 'Factory Director', color: '#dbeafe', text: '#1e40af', accent: '#3b82f6' },
     { id: 'hy-rd', name: 'R&D', color: '#ede9fe', text: '#5b21b6', accent: '#8b5cf6' },
     { id: 'hy-cpo', name: 'CPO', color: '#e0f2fe', text: '#075985', accent: '#0ea5e9' },
     { id: 'hy-hr', name: 'HR', color: '#fae8ff', text: '#86198f', accent: '#d946ef' },
