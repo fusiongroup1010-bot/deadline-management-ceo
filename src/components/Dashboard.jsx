@@ -29,7 +29,7 @@ const formatDate = (d, end) => {
 };
 
 const Dashboard = () => {
-  const { items: allItems, openEditModal } = useEvents();
+  const { filteredItems: items, openEditModal, activeLocation } = useEvents();
   const tday = today();
 
   // Current Week Filter (Monday to Sunday)
@@ -44,13 +44,6 @@ const Dashboard = () => {
   const endOfWk = new Date(startOfWk);
   endOfWk.setDate(startOfWk.getDate() + 6);
   endOfWk.setHours(23,59,59,999);
-
-  const items = allItems.filter(item => {
-    const d1 = new Date(item.dueDate + 'T00:00:00');
-    const d2 = new Date((item.endDate || item.dueDate) + 'T23:59:59');
-    // Overlap with [startOfWk, endOfWk]
-    return d1 <= endOfWk && startOfWk <= d2;
-  });
 
   /* ── Stats ── */
   const dueToday   = items.filter(t => t.status !== 'done' && t.dueDate === tday);
@@ -82,16 +75,19 @@ const Dashboard = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
       {/* Greeting banner */}
       <div className="soft-panel animate-fade-in" style={{
-        background: 'linear-gradient(135deg, #f1e0ff 0%, #d8b4fe 100%)',
+        background: 'linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%)',
         padding: '32px', borderRadius: 'var(--radius-lg)',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        border: 'none', boxShadow: '0 12px 30px rgba(224,195,252,0.4)'
+        border: 'none', boxShadow: '0 12px 30px rgba(96,165,250,0.4)'
       }}>
         <div>
           <h1 style={{ fontSize: '26px', fontWeight: '800', color: 'var(--primary-accent)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            Good morning! <Sparkles size={22} color="var(--primary-accent)" />
+            Good morning, CEO! <Sparkles size={22} color="var(--primary-accent)" />
           </h1>
-          <p style={{ color: '#8855b3', fontSize: '15px', fontWeight: '600' }}>
+          <p style={{ color: '#1e40af', fontSize: '15px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            Current Sheet: {activeLocation}
+          </p>
+          <p style={{ color: '#3b82f6', fontSize: '14px', fontWeight: '600', marginTop: '4px' }}>
             Week: {format(startOfWk, 'dd MMM')} - {format(endOfWk, 'dd MMM')} · {dueToday.length > 0 ? `${dueToday.length} item${dueToday.length>1?'s':''} due today` : 'No tasks due today'}{overdue.length > 0 ? ` · ${overdue.length} overdue` : ''}
           </p>
         </div>

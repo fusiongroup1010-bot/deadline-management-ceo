@@ -1,37 +1,34 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 
-/* ── Category palette ── */
-export const CATEGORY_MAP = {
-  rd: { name: 'R&D',            color: '#ffe5b4', text: '#d98a41', accent: '#f97316' },
-  qc: { name: 'QC',             color: '#fbcfe8', text: '#d96875', accent: '#ec4899' },
-  mm: { name: 'Media Marketing', color: '#bbf7d0', text: '#5fb078', accent: '#22c55e' },
-  hy: { name: 'HY Evolution',   color: '#bfdbfe', text: '#5a9bd4', accent: '#3b82f6' },
+/* ── Location-based Departments ── */
+export const DEPARTMENTS = {
+  hanoi: [
+    { id: 'hn-bm', name: 'Branch Manager', color: '#dbeafe', text: '#1e40af', accent: '#3b82f6' },
+    { id: 'hn-soff', name: 'Sale Offline', color: '#ffedd5', text: '#9a3412', accent: '#f97316' },
+    { id: 'hn-sadmin', name: 'Sale Admin', color: '#fef9c3', text: '#854d0e', accent: '#eab308' },
+    { id: 'hn-acc', name: 'Accountant', color: '#dcfce7', text: '#166534', accent: '#22c55e' },
+    { id: 'hn-sonl', name: 'Sale Online', color: '#fce7f3', text: '#9d174d', accent: '#ec4899' },
+    { id: 'hn-mkt', name: 'MKT', color: '#e0f2fe', text: '#075985', accent: '#0ea5e9' },
+    { id: 'hn-pur', name: 'Purchasing', color: '#ede9fe', text: '#5b21b6', accent: '#8b5cf6' },
+    { id: 'hn-hr', name: 'HR', color: '#fae8ff', text: '#86198f', accent: '#d946ef' },
+    { id: 'hn-log', name: 'Logistics', color: '#f1f5f9', text: '#334155', accent: '#64748b' },
+    { id: 'hn-sm', name: 'Shop Manager', color: '#fff1f2', text: '#9f1239', accent: '#f43f5e' },
+  ],
+  hcm: [
+    { id: 'hcm-bm', name: 'Branch Manager', color: '#dbeafe', text: '#1e40af', accent: '#3b82f6' },
+    { id: 'hcm-log', name: 'Logistics', color: '#f1f5f9', text: '#334155', accent: '#64748b' },
+    { id: 'hcm-mkt', name: 'MKT', color: '#e0f2fe', text: '#075985', accent: '#0ea5e9' },
+    { id: 'hcm-hr', name: 'HR', color: '#fae8ff', text: '#86198f', accent: '#d946ef' },
+    { id: 'hcm-sm', name: 'Shop Manager', color: '#fff1f2', text: '#9f1239', accent: '#f43f5e' },
+  ]
 };
 
-/* ── Unified initial data (shared by Calendar, Planner, Dashboard) ── */
-const initialItems = [
-  // Meetings
-  { id: 'i1',  title: 'Weekly Briefing',        type: 'meeting', categoryId: 'hy', priority: 'high',   status: 'todo',        dueDate: '2026-03-24', dueTime: '09:00', duration: 1   },
-  { id: 'i2',  title: 'TechCorp Partner Meet',  type: 'meeting', categoryId: 'mm', priority: 'high',   status: 'in-progress', dueDate: '2026-03-20', dueTime: '14:30', duration: 1.5 },
-  { id: 'i3',  title: 'Project Team 3 Sync',    type: 'meeting', categoryId: 'mm', priority: 'medium', status: 'todo',        dueDate: '2026-03-19', dueTime: '09:00', duration: 2   },
-  { id: 'i4',  title: 'Team Building Q2',       type: 'meeting', categoryId: 'rd', priority: 'low',    status: 'in-progress', dueDate: '2026-03-21', dueTime: '11:00', duration: 3   },
-  { id: 'i5',  title: 'Marketing Strategy Meet',type: 'meeting', categoryId: 'mm', priority: 'low',    status: 'done',        dueDate: '2026-03-17', dueTime: '10:00', duration: 1   },
-  { id: 'i6',  title: 'Outing with friends',    type: 'meeting', categoryId: 'mm', priority: 'low',    status: 'done',        dueDate: '2026-03-20', dueTime: '09:00', duration: 4   },
-  // Tasks
-  { id: 'i7',  title: 'DB System Design',       type: 'task',    categoryId: 'rd', priority: 'medium', status: 'in-progress', dueDate: '2026-03-21', dueTime: '14:00', duration: 2   },
-  { id: 'i8',  title: 'Frontend Code Review',   type: 'task',    categoryId: 'hy', priority: 'low',    status: 'todo',        dueDate: '2026-03-25', dueTime: '10:00', duration: 1.5 },
-  { id: 'i9',  title: 'Design new UI file',     type: 'task',    categoryId: 'rd', priority: 'high',   status: 'todo',        dueDate: '2026-03-19', dueTime: '14:00', duration: 3.5 },
-  { id: 'i10', title: 'Edit Tiktok Video',      type: 'task',    categoryId: 'qc', priority: 'medium', status: 'in-progress', dueDate: '2026-03-20', dueTime: '17:00', duration: 1.5 },
-  { id: 'i11', title: 'Brain Dump Idea Q2',     type: 'task',    categoryId: 'qc', priority: 'low',    status: 'todo',        dueDate: '2026-03-22', dueTime: '16:30', duration: 2   },
-  { id: 'i12', title: 'Advanced Design Course', type: 'task',    categoryId: 'hy', priority: 'medium', status: 'in-progress', dueDate: '2026-03-19', dueTime: '14:00', duration: 3   },
-  { id: 'i13', title: 'Study Vocab',            type: 'task',    categoryId: 'hy', priority: 'low',    status: 'todo',        dueDate: '2026-03-21', dueTime: '17:30', duration: 1.5 },
-  { id: 'i14', title: 'Grocery Shopping',       type: 'task',    categoryId: 'mm', priority: 'low',    status: 'todo',        dueDate: '2026-03-22', dueTime: '13:00', duration: 3.5 },
-  { id: 'i15', title: 'Adjust Paid Ads',        type: 'task',    categoryId: 'mm', priority: 'medium', status: 'in-progress', dueDate: '2026-03-24', dueTime: '10:00', duration: 3   },
-  // Reports
-  { id: 'i16', title: 'Q1 Sales Report',        type: 'report',  categoryId: 'mm', priority: 'high',   status: 'todo',        dueDate: '2026-03-22', dueTime: '',      duration: 2   },
-  { id: 'i17', title: 'Team Performance Review',type: 'report',  categoryId: 'qc', priority: 'medium', status: 'todo',        dueDate: '2026-03-26', dueTime: '',      duration: 1.5 },
-  { id: 'i18', title: 'Write API Docs',         type: 'report',  categoryId: 'rd', priority: 'medium', status: 'done',        dueDate: '2026-03-18', dueTime: '',      duration: 1   },
-];
+// Flat map for lookup
+export const CATEGORY_MAP = Object.fromEntries(
+  Object.values(DEPARTMENTS).flat().map(d => [d.id, d])
+);
+
+const initialItems = []; // Start fresh for CEO branch
 
 import { db } from '../firebase';
 import { 
@@ -51,6 +48,7 @@ export const EventProvider = ({ children }) => {
   const [items, setItems] = useState([]); // Real-time sync
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(null);
+  const [activeLocation, setActiveLocation] = useState('hanoi');
   const { currentUser } = useAuth();
 
   // Sync with Firestore
@@ -142,8 +140,11 @@ export const EventProvider = ({ children }) => {
 
   return (
     <EventContext.Provider value={{
-      items,           // unified list (use in Planner/Dashboard)
-      events,          // alias (Calendar uses this)
+      items,           // raw unified list
+      activeLocation,
+      setActiveLocation,
+      filteredItems: items.filter(i => i.location === activeLocation),
+      events: items.filter(i => i.location === activeLocation), // For Calendar
       addEvent, updateEvent, deleteEvent, changeStatus,
       isModalOpen, setIsModalOpen,
       currentEvent,

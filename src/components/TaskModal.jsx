@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { useEvents, CATEGORY_MAP } from '../context/EventContext';
+import { useEvents, CATEGORY_MAP, DEPARTMENTS } from '../context/EventContext';
 import { useAuth } from '../context/AuthContext';
-import { X, Calendar, Clock, Flag, Users, Tag, FileText } from 'lucide-react';
-
-const CATEGORIES = Object.entries(CATEGORY_MAP).map(([id, v]) => ({ id, ...v }));
+import { X, Calendar, Clock, Flag, Users, Tag, FileText, MapPin } from 'lucide-react';
 
 const selectStyle = {
   width: '100%', padding: '10px 14px', borderRadius: '12px',
@@ -22,15 +20,20 @@ const labelStyle = {
 };
 
 const TaskModal = () => {
-  const { isModalOpen, setIsModalOpen, addEvent, updateEvent, deleteEvent, currentEvent } = useEvents();
+  const { isModalOpen, setIsModalOpen, addEvent, updateEvent, deleteEvent, currentEvent, activeLocation } = useEvents();
   const { currentUser } = useAuth();
 
   const defaultForm = {
-    title: '', type: 'task', categoryId: 'rd',
-    priority: 'medium', status: 'todo',
+    title: '', 
+    type: 'task', 
+    categoryId: 'hn-bm',
+    location: activeLocation || 'hanoi', // Default to current view's location
+    priority: 'medium', 
+    status: 'todo',
     dueDate: new Date().toISOString().split('T')[0],
     endDate: new Date().toISOString().split('T')[0],
-    dueTime: '09:00', duration: 1,
+    dueTime: '09:00', 
+    duration: 1,
   };
 
   const [form, setForm] = useState(defaultForm);
@@ -40,7 +43,8 @@ const TaskModal = () => {
       setForm({
         title:      currentEvent.title      || '',
         type:       currentEvent.type       || 'task',
-        categoryId: currentEvent.categoryId || 'rd',
+        categoryId: currentEvent.categoryId || 'hn-bm',
+        location:   currentEvent.location   || 'hanoi',
         priority:   currentEvent.priority   || 'medium',
         status:     currentEvent.status     || 'todo',
         dueDate:    currentEvent.dueDate    || new Date().toISOString().split('T')[0],
@@ -49,18 +53,25 @@ const TaskModal = () => {
         duration:   currentEvent.duration   || 1,
       });
     } else {
-      setForm(defaultForm);
+      setForm({ ...defaultForm, location: activeLocation });
     }
-  }, [currentEvent, isModalOpen]);
+  }, [currentEvent, isModalOpen, activeLocation]);
 
   if (!isModalOpen) return null;
 
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const set = (k, v) => {
+    if (k === 'location') {
+      const firstDept = DEPARTMENTS[v][0]?.id;
+      setForm(f => ({ ...f, [k]: v, categoryId: firstDept }));
+    } else {
+      setForm(f => ({ ...f, [k]: v }));
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!form.title.trim()) return;
-    const cat = CATEGORY_MAP[form.categoryId] || CATEGORY_MAP.rd;
+    const cat = CATEGORY_MAP[form.categoryId] || (DEPARTMENTS[form.location][0]);
     const itemData = {
       ...form,
       duration: parseFloat(form.duration),
@@ -75,6 +86,8 @@ const TaskModal = () => {
       addEvent(itemData);
     }
   };
+
+  const currentCategories = DEPARTMENTS[form.location] || [];
 
   const TypeIcon = form.type === 'meeting' ? Users : form.type === 'report' ? FileText : Tag;
   const typeColors = {
@@ -131,8 +144,15 @@ const TaskModal = () => {
             />
           </div>
 
-          {/* Type + Category */}
+          {/* Location + Type */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="form-group">
+              <label style={labelStyle}><MapPin size={11} style={{ display: 'inline', marginRight: 4 }} />Location</label>
+              <select value={form.location} onChange={e => set('location', e.target.value)} style={selectStyle}>
+                <option value="hanoi">Hanoi</option>
+                <option value="hcm">HCM</option>
+              </select>
+            </div>
             <div className="form-group">
               <label style={labelStyle}>Type</label>
               <select value={form.type} onChange={e => set('type', e.target.value)} style={selectStyle}>
@@ -141,10 +161,14 @@ const TaskModal = () => {
                 <option value="report">📊 Report</option>
               </select>
             </div>
+          </div>
+
+          {/* Department + Priority */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <div className="form-group">
               <label style={labelStyle}>Department</label>
               <select value={form.categoryId} onChange={e => set('categoryId', e.target.value)} style={selectStyle}>
-                {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                {currentCategories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </div>
           </div>

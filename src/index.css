@@ -1,37 +1,41 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
 
 :root {
-  /* Pastel & Soft Color Palette */
-  --bg-main: #faf9f6; /* Very light, warm, relaxing background */
+  /* Trendy Blue Pastel & Soft Color Palette */
+  --bg-main: #f0f9ff; /* Very light sky blue background */
   --bg-panel: #ffffff;
-  --bg-panel-hover: #f8f9fa;
-  --border-light: rgba(0, 0, 0, 0.04);
-  --border-focus: rgba(0, 0, 0, 0.08);
+  --bg-panel-hover: #f1f5f9;
+  --border-light: rgba(59, 130, 246, 0.08); /* Light blue border */
+  --border-focus: rgba(59, 130, 246, 0.2);
   
-  /* Text Colors - Softened for reduced eye strain */
-  --text-primary: #4a4a4a;
-  --text-secondary: #7a7a7a;
-  --text-muted: #a0a0a0;
+  /* Text Colors */
+  --text-primary: #1e3a8a; /* Deep navy blue */
+  --text-secondary: #3b82f6; /* Azure blue */
+  --text-muted: #94a3b8; /* Slate blue */
   
-  /* Priority/Status Pastel Colors */
-  --primary-pastel: #e0c3fc; /* Lavender - Medium */
-  --blue-pastel: #c6e2ff; /* Light Blue - Low */
-  --green-pastel: #d4edda; /* Mint Green - Done */
-  --yellow-pastel: #fff3cd; /* Soft Yellow - Upcoming */
-  --orange-pastel: #ffe5b4; /* Peach/Orange - Due Soon */
-  --pink-pastel: #f8d7da; /* Soft Pink - High Priority/Overdue */
-
-  /* Pastel Text/Accent colors for contrast inside badges */
-  --primary-accent: #9d65c9;
-  --blue-accent: #5a9bd4;
-  --green-accent: #5fb078;
-  --yellow-accent: #d4a946;
-  --orange-accent: #d98a41;
-  --pink-accent: #d96875;
+  /* Priority/Status Pastel Colors - Trendy Blue Base */
+  --primary-accent: #3b82f6; /* Trendy Blue */
+  --primary-pastel: #dbeafe; /* Pastel Blue */
+  --primary-pastel-hover: #bfdbfe;
+  
+  --blue-accent: #0ea5e9;
+  --blue-pastel: #e0f2fe;
+  
+  --pink-accent: #06b6d4; /* Shift pink to Cyan for trendy blue look */
+  --pink-pastel: #ecfeff;
+  
+  --green-accent: #10b981;
+  --green-pastel: #ecfdf5;
+  
+  --yellow-accent: #f59e0b;
+  --yellow-pastel: #fffbeb;
+  
+  --orange-accent: #f97316;
+  --orange-pastel: #fff7ed;
 
   /* Shadows and Borders */
-  --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.03);
-  --shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.06);
+  --shadow-soft: 0 10px 30px rgba(59, 130, 246, 0.05);
+  --shadow-hover: 0 15px 40px rgba(59, 130, 246, 0.12);
   --radius-sm: 12px;
   --radius-md: 20px;
   --radius-lg: 30px;

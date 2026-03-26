@@ -164,16 +164,20 @@ const EventCard = ({ event, topPos, height, leftPos, width, onEdit, onDelete, on
 /* ── Main CalendarView ── */
 const CalendarView = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const { events, openEditModal, deleteEvent, updateEvent, openAddModal } = useEvents();
+  const { events, openEditModal, deleteEvent, updateEvent, openAddModal, activeLocation } = useEvents();
   const { currentUser } = useAuth();
   const isGuest = currentUser?.role === 'guest';
+  
+  const currentDepts = DEPARTMENTS[activeLocation] || [];
 
   // Active category filter
-  const [activeCategories, setActiveCategories] = useState(
-    () => Object.fromEntries(CATEGORY_LIST.map(c => [c.id, true]))
-  );
+  const [activeCategories, setActiveCategories] = useState({});
   const [internalSidebarOpen, setInternalSidebarOpen] = useState(true);
   const [gridZoom, setGridZoom] = useState(240); // Initial day width in px
+
+  useEffect(() => {
+    setActiveCategories(Object.fromEntries(currentDepts.map(c => [c.id, true])));
+  }, [activeLocation]);
 
   const toggleCat = (id) => setActiveCategories(p => ({ ...p, [id]: !p[id] }));
 
@@ -265,7 +269,7 @@ const CalendarView = () => {
           <div style={{ marginTop: '12px' }}>
             <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '12px', color: 'var(--text-primary)' }}>My Calendars</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              {CATEGORY_LIST.map(cat => (
+              {currentDepts.map(cat => (
                 <label key={cat.id} className="check-item" style={{
                   cursor: 'pointer', padding: '6px 10px', borderRadius: '10px',
                   background: activeCategories[cat.id] ? `${cat.accent}18` : 'transparent',

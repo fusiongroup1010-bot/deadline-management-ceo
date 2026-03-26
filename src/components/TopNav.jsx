@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, Search, Plus, Calendar as CalendarIcon, Menu } from 'lucide-react';
+import { Bell, Search, Plus, Calendar as CalendarIcon, Menu, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { useEvents } from '../context/EventContext';
@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 
 const TopNav = ({ onMenuClick }) => {
   const today = new Date();
-  const { openAddModal } = useEvents();
+  const { openAddModal, activeLocation, setActiveLocation } = useEvents();
   const { currentUser } = useAuth();
 
   return (
@@ -19,8 +19,40 @@ const TopNav = ({ onMenuClick }) => {
       >
         <Menu size={24} />
       </button>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
-        <div className="soft-panel" style={{ display: 'flex', alignItems: 'center', padding: '12px 20px', borderRadius: 'var(--radius-full)', width: '340px', gap: '12px', background: 'var(--bg-panel)' }}>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: 1 }}>
+        {/* Location Switcher Tabs */}
+        <div style={{ 
+          display: 'flex', 
+          background: 'var(--bg-main)', 
+          padding: '4px', 
+          borderRadius: '14px',
+          border: '1px solid var(--border-light)',
+          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
+        }}>
+          {['hanoi', 'hcm'].map(loc => (
+            <button
+              key={loc}
+              onClick={() => setActiveLocation(loc)}
+              style={{
+                padding: '8px 24px',
+                borderRadius: '10px',
+                fontSize: '14px',
+                fontWeight: '800',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                background: activeLocation === loc ? 'var(--primary-accent)' : 'transparent',
+                color: activeLocation === loc ? 'white' : 'var(--text-muted)',
+                boxShadow: activeLocation === loc ? '0 4px 12px rgba(96, 165, 250, 0.3)' : 'none'
+              }}
+            >
+              {loc}
+            </button>
+          ))}
+        </div>
+
+        <div className="soft-panel" style={{ display: 'none', alignItems: 'center', padding: '12px 20px', borderRadius: 'var(--radius-full)', width: '340px', gap: '12px', background: 'var(--bg-panel)' }}>
           <Search size={18} color="var(--text-muted)" />
           <input 
             type="text" 

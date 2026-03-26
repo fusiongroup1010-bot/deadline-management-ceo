@@ -2,20 +2,17 @@ import React, { useState } from 'react';
 import { Filter, Calendar, FileText, CheckCircle, AlertCircle, Clock } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { enUS } from 'date-fns/locale';
-
-const MOCK_REPORTS = [
-  { id: 1, title: 'Q1 Sales Report', department: 'Sales', dueDate: new Date(), status: 'due-soon', author: 'Anna Tran' },
-  { id: 2, title: 'Marketing Plan June', department: 'Marketing', dueDate: addDays(new Date(), -2), status: 'overdue', author: 'Mark Le' },
-  { id: 3, title: 'HR KPI Review', department: 'HR', dueDate: addDays(new Date(), -5), status: 'submitted', author: 'Sarah Nguyen' },
-  { id: 4, title: 'Q1 Financial Report', department: 'Finance', dueDate: addDays(new Date(), 3), status: 'upcoming', author: 'David Vu' },
-];
+import { useEvents } from '../context/EventContext';
 
 const ReportBoard = () => {
+  const { filteredItems: allItems } = useEvents();
   const [filter, setFilter] = useState('all');
 
+  const reports = allItems.filter(i => i.type === 'report');
+
   const filteredReports = filter === 'all' 
-    ? MOCK_REPORTS 
-    : MOCK_REPORTS.filter(r => r.status === filter);
+    ? reports 
+    : reports.filter(r => r.status === filter);
 
   const getStatusBadge = (status) => {
     switch (status) {
