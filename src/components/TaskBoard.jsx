@@ -215,7 +215,7 @@ const TaskCard = ({ task, index, onEdit, onDelete, onStatusChange, canEdit }) =>
 };
 
 /* ── Type group in To Do column ── */
-const TypeGroup = ({ label, icon: Icon, color, bg, tasks, onEdit, onDelete, onStatusChange, startIndex, isGuest }) => {
+const TypeGroup = ({ label, icon: Icon, color, bg, tasks, onEdit, onDelete, onStatusChange, startIndex, canEdit }) => {
   const [open, setOpen] = useState(true);
   if (tasks.length === 0) return null;
   return (
