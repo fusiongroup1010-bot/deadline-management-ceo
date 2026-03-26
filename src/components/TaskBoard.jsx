@@ -44,7 +44,7 @@ const isOverdue = (task) => {
 const isDueToday = (task) => task.dueDate === today();
 
 /* ────────── Task Card ────────── */
-const TaskCard = ({ task, index, onEdit, onDelete, onStatusChange, isGuest }) => {
+const TaskCard = ({ task, index, onEdit, onDelete, onStatusChange, canEdit }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const TypeIcon = TYPE_CONFIG[task.type]?.icon || Tag;
@@ -53,9 +53,9 @@ const TaskCard = ({ task, index, onEdit, onDelete, onStatusChange, isGuest }) =>
   const catCfg = CATEGORIES.find(c => c.id === task.categoryId);
   const overdue = isOverdue(task);
   const dueToday = isDueToday(task);
-
+ 
   return (
-    <Draggable draggableId={task.id} index={index} isDragDisabled={isGuest}>
+    <Draggable draggableId={task.id} index={index} isDragDisabled={!canEdit}>
       {(provided, snapshot) => (
         <div
           ref={provided.innerRef}
@@ -102,7 +102,7 @@ const TaskCard = ({ task, index, onEdit, onDelete, onStatusChange, isGuest }) =>
             </div>
 
             {/* ... menu restrictions */}
-            {!isGuest && (
+            {canEdit && (
               <div style={{ position: 'relative' }}>
                 <button
                   onClick={(e) => { e.stopPropagation(); setMenuOpen(p => !p); }}
@@ -237,7 +237,7 @@ const TypeGroup = ({ label, icon: Icon, color, bg, tasks, onEdit, onDelete, onSt
       </button>
       {open && tasks.map((task, i) => (
         <TaskCard key={task.id} task={task} index={startIndex + i}
-          onEdit={onEdit} onDelete={onDelete} onStatusChange={onStatusChange} isGuest={isGuest} />
+          onEdit={onEdit} onDelete={onDelete} onStatusChange={onStatusChange} canEdit={canEdit} />
       ))}
     </div>
   );
@@ -345,9 +345,9 @@ const NotificationBell = ({ tasks }) => {
 
 /* ────────── Main TaskBoard ────────── */
 const TaskBoard = () => {
-  const { filteredItems: allItems, updateEvent, deleteEvent, changeStatus, openAddModal, openEditModal } = useEvents();
+  const { filteredItems: allItems, updateEvent, deleteEvent, changeStatus, openAddModal, openEditModal, isEditable } = useEvents();
   const { currentUser } = useAuth();
-  const isGuest = currentUser?.role === 'guest';
+  const canEdit = isEditable;
 
   // Current Week Filter (Monday to Sunday)
   const now = new Date();
@@ -404,7 +404,7 @@ const TaskBoard = () => {
         </div>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <NotificationBell tasks={items} />
-          {!isGuest && (
+          {canEdit && (
             <button
               onClick={openAddModal}
               style={{
@@ -432,9 +432,9 @@ const TaskBoard = () => {
               {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.droppableProps}
                   style={{ minHeight: '200px', background: snapshot.isDraggingOver ? 'rgba(124,58,237,0.04)' : 'transparent', borderRadius: '12px', transition: 'background 0.2s' }}>
-                  <TypeGroup label="Meeting" icon={Users}    color="#7c3aed" bg="#f3e8ff" tasks={todoMeetings}  startIndex={0}                                        onEdit={openEditModal} onDelete={deleteEvent} onStatusChange={changeStatus} isGuest={isGuest} />
-                  <TypeGroup label="Task"    icon={Tag}      color="#0891b2" bg="#e0f2fe" tasks={todoTaskItems} startIndex={todoMeetings.length}                        onEdit={openEditModal} onDelete={deleteEvent} onStatusChange={changeStatus} isGuest={isGuest} />
-                  <TypeGroup label="Report"  icon={FileText} color="#d97706" bg="#fef3c7" tasks={todoReports}   startIndex={todoMeetings.length + todoTaskItems.length} onEdit={openEditModal} onDelete={deleteEvent} onStatusChange={changeStatus} isGuest={isGuest} />
+                  <TypeGroup label="Meeting" icon={Users}    color="#7c3aed" bg="#f3e8ff" tasks={todoMeetings}  startIndex={0}                                        onEdit={openEditModal} onDelete={deleteEvent} onStatusChange={changeStatus} canEdit={canEdit} />
+                  <TypeGroup label="Task"    icon={Tag}      color="#0891b2" bg="#e0f2fe" tasks={todoTaskItems} startIndex={todoMeetings.length}                        onEdit={openEditModal} onDelete={deleteEvent} onStatusChange={changeStatus} canEdit={canEdit} />
+                  <TypeGroup label="Report"  icon={FileText} color="#d97706" bg="#fef3c7" tasks={todoReports}   startIndex={todoMeetings.length + todoTaskItems.length} onEdit={openEditModal} onDelete={deleteEvent} onStatusChange={changeStatus} canEdit={canEdit} />
                   {todoTasks.length === 0 && <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px', padding: '32px 0' }}>No tasks 🎉</p>}
                   {provided.placeholder}
                 </div>
@@ -451,7 +451,7 @@ const TaskBoard = () => {
                   style={{ minHeight: '200px', background: snapshot.isDraggingOver ? 'rgba(8,145,178,0.04)' : 'transparent', borderRadius: '12px', transition: 'background 0.2s' }}>
                   {inProgressTasks.length === 0 && <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px', padding: '32px 0' }}>Nothing in progress</p>}
                   {inProgressTasks.map((task, i) => (
-                    <TaskCard key={task.id} task={task} index={i} onEdit={openEditModal} onDelete={deleteEvent} onStatusChange={changeStatus} isGuest={isGuest} />
+                    <TaskCard key={task.id} task={task} index={i} onEdit={openEditModal} onDelete={deleteEvent} onStatusChange={changeStatus} canEdit={canEdit} />
                   ))}
                   {provided.placeholder}
                 </div>
@@ -468,7 +468,7 @@ const TaskBoard = () => {
                   style={{ minHeight: '200px', background: snapshot.isDraggingOver ? 'rgba(22,163,74,0.04)' : 'transparent', borderRadius: '12px', transition: 'background 0.2s' }}>
                   {doneTasks.length === 0 && <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px', padding: '32px 0' }}>No completed tasks yet</p>}
                   {doneTasks.map((task, i) => (
-                    <TaskCard key={task.id} task={task} index={i} onEdit={openEditModal} onDelete={deleteEvent} onStatusChange={changeStatus} isGuest={isGuest} />
+                    <TaskCard key={task.id} task={task} index={i} onEdit={openEditModal} onDelete={deleteEvent} onStatusChange={changeStatus} canEdit={canEdit} />
                   ))}
                   {provided.placeholder}
                 </div>

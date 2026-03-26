@@ -155,6 +155,7 @@ export const EventProvider = ({ children }) => {
       setActiveLocation,
       filteredItems: items.filter(i => i.location === activeLocation),
       events: items.filter(i => i.location === activeLocation), // For Calendar
+      isEditable: currentUser?.editableLocations?.includes(activeLocation), 
       addEvent, updateEvent, deleteEvent, changeStatus,
       isModalOpen, setIsModalOpen,
       currentEvent,

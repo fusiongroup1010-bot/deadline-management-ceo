@@ -35,7 +35,7 @@ const toCalSlot = (item, weekStart) => {
 };
 
 /* ── Event Card with hover ... dropdown ── */
-const EventCard = ({ event, topPos, height, leftPos, width, onEdit, onDelete, onOpen, isGuest }) => {
+const EventCard = ({ event, topPos, height, leftPos, width, onEdit, onDelete, onOpen, canEdit }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -60,14 +60,14 @@ const EventCard = ({ event, topPos, height, leftPos, width, onEdit, onDelete, on
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => { setIsHovered(false); setMenuOpen(false); }}
-      onClick={() => { if(!isGuest) onOpen(); }}
+      onClick={() => { if(canEdit) onOpen(); }}
     >
       {/* Title + ... button */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '4px' }}>
         <div className="event-title" style={{ flex: 1 }}>
           {TYPE_LABEL[event.type] || ''} {event.title}
         </div>
-        {!isGuest && (
+        {canEdit && (
           <div style={{ position: 'relative', flexShrink: 0 }}>
             <button
               onClick={(e) => { e.stopPropagation(); setMenuOpen(p => !p); }}
@@ -164,9 +164,9 @@ const EventCard = ({ event, topPos, height, leftPos, width, onEdit, onDelete, on
 /* ── Main CalendarView ── */
 const CalendarView = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const { events, openEditModal, deleteEvent, updateEvent, openAddModal, activeLocation } = useEvents();
+  const { events, openEditModal, deleteEvent, updateEvent, openAddModal, activeLocation, isEditable } = useEvents();
   const { currentUser } = useAuth();
-  const isGuest = currentUser?.role === 'guest';
+  const canEdit = isEditable;
   
   const currentDepts = DEPARTMENTS[activeLocation] || [];
 
@@ -240,7 +240,7 @@ const CalendarView = () => {
 
         {/* Internal Sidebar (Date & Filters) */}
         <div className={`calendar-sidebar ${!internalSidebarOpen ? 'collapsed' : ''}`}>
-          {!isGuest && (
+          {canEdit && (
             <button
               style={{
                 background: 'var(--bg-main)', border: '1px solid var(--border-light)', padding: '10px 20px',
@@ -350,7 +350,7 @@ const CalendarView = () => {
                     onEdit={() => editTitle(slot)}
                     onDelete={() => deleteEvent(slot.id)}
                     onOpen={() => openEditModal(slot)}
-                    isGuest={isGuest}
+                    canEdit={canEdit}
                   />
                 );
               })}
