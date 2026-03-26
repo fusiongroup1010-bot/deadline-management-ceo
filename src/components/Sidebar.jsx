@@ -1,9 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, CalendarClock, LayoutDashboard, ChevronLeft } from 'lucide-react';
+import { Home, CalendarClock, LayoutDashboard, ChevronLeft, Megaphone } from 'lucide-react';
 import logo from '../assets/fusion-logo.png';
+import { useNotify } from '../context/NotifyContext';
 
 const Sidebar = ({ isOpen, onClose }) => {
+  const { unreadCount } = useNotify();
 
   return (
     <>
@@ -53,6 +55,18 @@ const Sidebar = ({ isOpen, onClose }) => {
             <div className={`btn-ghost ${isActive ? 'active' : ''}`}>
               <CalendarClock size={20} strokeWidth={isActive ? 2.5 : 2} />
               <span>Calendar</span>
+            </div>
+          )}
+        </NavLink>
+
+        <NavLink to="/notify" style={{ textDecoration: 'none' }}>
+          {({ isActive }) => (
+            <div className={`btn-ghost ${isActive ? 'active' : ''}`}>
+              <div style={{ position: 'relative' }}>
+                <Megaphone size={20} strokeWidth={isActive ? 2.5 : 2} />
+                {unreadCount > 0 && <span style={{ position: 'absolute', top: '-4px', right: '-4px', background: '#ef4444', border: '1.5px solid white', borderRadius: '50%', width: '10px', height: '10px' }}></span>}
+              </div>
+              <span>Notify Center</span>
             </div>
           )}
         </NavLink>

@@ -1326,6 +1326,39 @@ button {
   .notify-wrapper { bottom: 16px; right: 16px; }
 }
 
+.notify-board-item:hover {
+  transform: translateX(8px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+.notify-board-item.unread {
+  background: var(--primary-pastel) !important;
+}
+
+.notify-board-item.emergency {
+  border-left: 8px solid #ef4444 !important;
+}
+
+.btn-ghost-mini {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.btn-ghost-mini:hover {
+  background: var(--bg-panel-hover);
+  color: var(--text-primary);
+}
+
 .greeting-icon-animate {
   animation: floatIcon 3s ease-in-out infinite;
   display: flex;

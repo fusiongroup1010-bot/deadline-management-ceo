@@ -7,6 +7,7 @@ import CalendarView from './components/CalendarView';
 import TaskBoard from './components/TaskBoard';
 import TaskModal from './components/TaskModal';
 import Login from './components/Login';
+import NotifyBoard from './components/NotifyBoard';
 import { EventProvider } from './context/EventContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotifyProvider } from './context/NotifyContext';
@@ -57,6 +58,7 @@ function AppContent() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/calendar" element={<CalendarView />} />
             <Route path="/tasks" element={<TaskBoard />} />
+            <Route path="/notify" element={<NotifyBoard />} />
             <Route path="/reports" element={<CalendarView />} />
             <Route path="/login" element={<Navigate to="/" replace />} />
             {/* Fallback */}
