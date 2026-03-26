@@ -345,7 +345,7 @@ const NotificationBell = ({ tasks }) => {
 
 /* ────────── Main TaskBoard ────────── */
 const TaskBoard = () => {
-  const { items: allItems, updateEvent, deleteEvent, changeStatus, openAddModal, openEditModal } = useEvents();
+  const { filteredItems: allItems, updateEvent, deleteEvent, changeStatus, openAddModal, openEditModal } = useEvents();
   const { currentUser } = useAuth();
   const isGuest = currentUser?.role === 'guest';
 
