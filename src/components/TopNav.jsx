@@ -95,13 +95,20 @@ const TopNav = ({ onMenuClick }) => {
           <div 
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             style={{ 
-              padding: '0 16px', height: '44px', borderRadius: '16px', 
+              padding: '0 12px 0 6px', height: '44px', borderRadius: '16px', 
               background: 'var(--pink-pastel)', display: 'flex', alignItems: 'center', 
               justifyContent: 'center', fontWeight: '800', color: 'var(--pink-accent)', 
               marginLeft: '4px', cursor: 'pointer', boxShadow: 'var(--shadow-soft)', 
-              fontSize: '14px', gap: '8px', border: isDropdownOpen ? '1px solid var(--pink-accent)' : '1px solid transparent'
+              fontSize: '14px', gap: '10px', border: isDropdownOpen ? '1px solid var(--pink-accent)' : '1px solid transparent'
             }}
           >
+            <div style={{ width: '32px', height: '32px', borderRadius: '10px', overflow: 'hidden', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+               {currentUser?.avatar ? (
+                 <img src={currentUser.avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+               ) : (
+                 <User size={18} />
+               )}
+            </div>
             {currentUser ? (currentUser.id === 'Guest' ? 'Guest mode' : currentUser.name) : 'Guest'}
             <ChevronDown size={14} style={{ transform: isDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
           </div>

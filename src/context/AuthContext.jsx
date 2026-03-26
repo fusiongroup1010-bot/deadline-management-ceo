@@ -60,8 +60,19 @@ export function AuthProvider({ children }) {
     const user = EMPLOYEES.find(e => e.id.toLowerCase() === targetUserId.toLowerCase());
     
     if (user && (user.role === 'guest' || user.pass === password)) {
-      const storedName = localStorage.getItem(`name_${user.id}`);
-      const sessionUser = { ...user, name: storedName || user.name };
+      const savedName = localStorage.getItem(`name_${user.id}`);
+      const savedDept = localStorage.getItem(`dept_${user.id}`);
+      const savedAddr = localStorage.getItem(`addr_${user.id}`);
+      const savedAvatar = localStorage.getItem(`avatar_${user.id}`);
+      
+      const sessionUser = { 
+        ...user, 
+        name: savedName || user.name,
+        department: savedDept || user.title,
+        address: savedAddr || user.allowedLocations[0],
+        avatar: savedAvatar || null
+      };
+      
       setCurrentUser(sessionUser);
       localStorage.setItem('mockUser', JSON.stringify(sessionUser));
       return Promise.resolve(sessionUser);
@@ -69,12 +80,18 @@ export function AuthProvider({ children }) {
     return Promise.reject(new Error('Incorrect ID or password!'));
   }
 
-  function updateProfile(newName) {
+  function updateProfile(profileData) {
     if (!currentUser) return;
-    const updated = { ...currentUser, name: newName };
+    const updated = { ...currentUser, ...profileData };
     setCurrentUser(updated);
     localStorage.setItem('mockUser', JSON.stringify(updated));
-    localStorage.setItem(`name_${currentUser.id}`, newName);
+    
+    // Save specific fields for long-term persistence linked to user ID
+    if (profileData.name) localStorage.setItem(`name_${currentUser.id}`, profileData.name);
+    if (profileData.department) localStorage.setItem(`dept_${currentUser.id}`, profileData.department);
+    if (profileData.address) localStorage.setItem(`addr_${currentUser.id}`, profileData.address);
+    if (profileData.avatar) localStorage.setItem(`avatar_${currentUser.id}`, profileData.avatar);
+    
     return Promise.resolve(updated);
   }
 
