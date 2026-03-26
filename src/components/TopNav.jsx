@@ -38,28 +38,30 @@ const TopNav = ({ onMenuClick }) => {
           flex: 1, // Allow it to expand
           overflow: 'hidden'
         }}>
-          {['hanoi', 'hcm', 'hungyen'].filter(loc => currentUser?.allowedLocations?.includes(loc)).map(loc => (
-            <button
-              key={loc}
-              onClick={() => setActiveLocation(loc)}
-              style={{
-                flex: 1, // Split width equally
-                padding: '8px 12px',
-                borderRadius: '10px',
-                fontSize: '13px',
-                fontWeight: '800',
-                textTransform: 'uppercase',
-                letterSpacing: '0.4px',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                background: activeLocation === loc ? 'var(--primary-accent)' : 'transparent',
-                color: activeLocation === loc ? 'white' : 'var(--text-muted)',
-                boxShadow: activeLocation === loc ? '0 4px 12px rgba(96, 165, 250, 0.3)' : 'none',
-                cursor: currentUser?.allowedLocations?.length > 1 ? 'pointer' : 'default',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              {loc}
-            </button>
+          {['hanoi', 'hcm', 'hungyen'].filter(loc => currentUser?.allowedLocations?.includes(loc)).map((loc, index, arr) => (
+            <React.Fragment key={loc}>
+              {index > 0 && <div style={{ width: '1px', background: 'var(--border-light)', height: '20px', alignSelf: 'center' }} />}
+              <button
+                onClick={() => setActiveLocation(loc)}
+                style={{
+                  flex: 1, 
+                  padding: '8px 12px',
+                  borderRadius: '10px',
+                  fontSize: '13px',
+                  fontWeight: '800',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.4px',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  background: activeLocation === loc ? 'var(--primary-accent)' : 'transparent',
+                  color: activeLocation === loc ? 'white' : 'var(--text-muted)',
+                  boxShadow: activeLocation === loc ? '0 4px 12px rgba(96, 165, 250, 0.3)' : 'none',
+                  cursor: currentUser?.allowedLocations?.length > 1 ? 'pointer' : 'default',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                {loc}
+              </button>
+            </React.Fragment>
           ))}
         </div>
 
