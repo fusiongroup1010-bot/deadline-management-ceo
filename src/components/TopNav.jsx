@@ -40,9 +40,9 @@ const TopNav = ({ onMenuClick }) => {
         }}>
           {['hanoi', 'hcm', 'hungyen'].filter(loc => currentUser?.allowedLocations?.includes(loc)).map((loc, index, arr) => {
             const colors = {
-              hanoi: { bg: 'var(--primary-accent)', shadow: 'rgba(96, 165, 250, 0.3)' },
-              hcm: { bg: 'var(--pink-accent)', shadow: 'rgba(244, 114, 182, 0.3)' },
-              hungyen: { bg: '#8b5cf6', shadow: 'rgba(139, 92, 246, 0.3)' }
+              hanoi: { bg: '#e0f2fe', text: '#0369a1', shadow: 'rgba(186, 230, 253, 0.5)' },
+              hcm: { bg: '#fce7f3', text: '#be185d', shadow: 'rgba(252, 231, 243, 0.5)' },
+              hungyen: { bg: '#f3e8ff', text: '#7e22ce', shadow: 'rgba(243, 232, 255, 0.5)' }
             };
             const isActive = activeLocation === loc;
 
@@ -61,10 +61,12 @@ const TopNav = ({ onMenuClick }) => {
                     letterSpacing: '0.4px',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     background: isActive ? colors[loc].bg : 'transparent',
-                    color: isActive ? 'white' : 'var(--text-muted)',
+                    color: isActive ? colors[loc].text : 'var(--text-muted)',
                     boxShadow: isActive ? `0 4px 12px ${colors[loc].shadow}` : 'none',
                     cursor: currentUser?.allowedLocations?.length > 1 ? 'pointer' : 'default',
-                    whiteSpace: 'nowrap'
+                    whiteSpace: 'nowrap',
+                    border: 'none',
+                    margin: '0 2px'
                   }}
                 >
                   {loc}
