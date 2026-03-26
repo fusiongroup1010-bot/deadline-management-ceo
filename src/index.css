@@ -1014,6 +1014,28 @@ button {
   accent-color: var(--primary-accent);
   margin-top: 4px;
 }
+.user-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  text-align: left;
+}
+
+.user-dropdown-item:hover {
+  background: var(--bg-panel-hover);
+  color: var(--primary-accent);
+  transform: translateX(4px);
+}
 
 @media (max-width: 1024px) {
   :root {

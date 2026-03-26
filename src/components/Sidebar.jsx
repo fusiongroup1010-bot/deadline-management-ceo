@@ -1,13 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, CalendarClock, Settings, LayoutDashboard, LogOut, ChevronLeft } from 'lucide-react';
+import { Home, CalendarClock, LayoutDashboard, ChevronLeft } from 'lucide-react';
 import logo from '../assets/fusion-logo.png';
-import { useAuth } from '../context/AuthContext';
-import SettingsModal from './SettingsModal';
 
 const Sidebar = ({ isOpen, onClose }) => {
-  const { logout } = useAuth();
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   return (
     <>
@@ -63,24 +59,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <button className="btn-ghost" title="Settings" onClick={() => setIsSettingsOpen(true)}>
-          <Settings size={20} />
-          <span>Settings</span>
-        </button>
-        <button 
-          className="btn-ghost" 
-          onClick={logout} 
-          style={{ color: 'var(--pink-accent)' }}
-          title="Logout"
-        >
-          <LogOut size={20} />
-          <span>Logout</span>
-        </button>
-      </div>
-
-      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
-    </aside>
+      </aside>
     </>
   );
 };
