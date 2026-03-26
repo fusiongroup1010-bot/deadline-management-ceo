@@ -15,17 +15,17 @@ const Sidebar = ({ isOpen, onClose }) => {
     {isOpen && <div className="sidebar-overlay-mobile" onClick={onClose} />}
     
     <aside className={`sidebar soft-panel ${isOpen ? 'active' : ''}`}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '8px' }}>
-          <img src={logo} alt="CEO Deadline Management Logo" style={{ height: '36px', width: 'auto', display: 'block' }} />
-          <h2 style={{ fontSize: '18px', fontWeight: '800', letterSpacing: '0.2px', color: 'var(--primary-accent)', lineHeight: '1.2' }}>
-            CEO Deadline<br />Management
-          </h2>
-        </div>
-        {/* Mobile close button */}
+      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: '48px', width: '100%' }}>
+        <img src={logo} alt="CEO Deadline Management Logo" style={{ height: '56px', width: 'auto', marginBottom: '16px' }} />
+        <h2 style={{ fontSize: '16px', fontWeight: '800', letterSpacing: '1px', color: 'var(--primary-accent)', lineHeight: '1.4', textTransform: 'uppercase' }}>
+          CEO Deadline<br />Management
+        </h2>
+        
+        {/* Mobile close button - absolute to not affect centering */}
         <button 
           className="sidebar-close-mobile"
           onClick={onClose}
+          style={{ position: 'absolute', right: '-12px', top: '0', display: 'none' }}
         >
           <ChevronLeft size={24} />
         </button>

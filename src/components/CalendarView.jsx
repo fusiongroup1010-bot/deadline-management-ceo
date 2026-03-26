@@ -4,7 +4,7 @@ import { format, startOfWeek, addDays, isSameDay, differenceInCalendarDays } fro
 import { enUS } from 'date-fns/locale';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
-import { useEvents, CATEGORY_MAP } from '../context/EventContext';
+import { useEvents, CATEGORY_MAP, DEPARTMENTS } from '../context/EventContext';
 import { useAuth } from '../context/AuthContext';
 
 const START_HOUR = 9;
@@ -30,7 +30,7 @@ const toCalSlot = (item, weekStart) => {
 
   const [h, m] = item.dueTime.split(':').map(Number);
   const start = h + m / 60;
-  const cat = CATEGORY_MAP[item.categoryId] || CATEGORY_MAP.rd;
+  const cat = CATEGORY_MAP[item.categoryId] || Object.values(CATEGORY_MAP)[0];
   return { ...item, day: clampedStart, spanDays, start, color: cat.color, text: cat.text };
 };
 
