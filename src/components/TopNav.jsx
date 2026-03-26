@@ -38,7 +38,7 @@ const TopNav = ({ onMenuClick }) => {
           flex: 1, // Allow it to expand
           overflow: 'hidden'
         }}>
-          {['hanoi', 'hcm'].filter(loc => currentUser?.allowedLocations?.includes(loc)).map(loc => (
+          {['hanoi', 'hcm', 'hungyen'].filter(loc => currentUser?.allowedLocations?.includes(loc)).map(loc => (
             <button
               key={loc}
               onClick={() => setActiveLocation(loc)}

@@ -16,9 +16,18 @@ export const DEPARTMENTS = {
   hcm: [
     { id: 'hcm-bm', name: 'Branch Manager', color: '#dbeafe', text: '#1e40af', accent: '#3b82f6' },
     { id: 'hcm-log', name: 'Logistics', color: '#f1f5f9', text: '#334155', accent: '#64748b' },
-    { id: 'hcm-mkt', name: 'MKT', color: '#e0f2fe', text: '#075985', accent: '#0ea5e9' },
     { id: 'hcm-sonl', name: 'Sale Online', color: '#fce7f3', text: '#9d174d', accent: '#ec4899' },
     { id: 'hcm-hr', name: 'HR', color: '#fae8ff', text: '#86198f', accent: '#d946ef' },
+  ],
+  hungyen: [
+    { id: 'hy-fd', name: 'Front Desk', color: '#dbeafe', text: '#1e40af', accent: '#3b82f6' },
+    { id: 'hy-rd', name: 'R&D', color: '#ede9fe', text: '#5b21b6', accent: '#8b5cf6' },
+    { id: 'hy-cpo', name: 'CPO', color: '#e0f2fe', text: '#075985', accent: '#0ea5e9' },
+    { id: 'hy-hr', name: 'HR', color: '#fae8ff', text: '#86198f', accent: '#d946ef' },
+    { id: 'hy-ac', name: 'Accountant', color: '#fef3c7', text: '#92400e', accent: '#d97706' },
+    { id: 'hy-qc', name: 'QC', color: '#f1f5f9', text: '#334155', accent: '#64748b' },
+    { id: 'hy-ds', name: 'Designer', color: '#fce7f3', text: '#9d174d', accent: '#ec4899' },
+    { id: 'hy-evo', name: 'Evolution', color: '#ecfdf5', text: '#065f46', accent: '#10b981' },
   ]
 };
 
