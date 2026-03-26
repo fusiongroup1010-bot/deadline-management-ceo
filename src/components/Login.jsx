@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth, EMPLOYEES } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import logo from '../assets/fusion-logo.png';
 
 const Login = () => {
   const [userId, setUserId] = useState('');
@@ -55,12 +56,14 @@ const Login = () => {
   return (
     <div className="login-page">
       <div className="login-card animate-fade-in">
-        <div className="login-header">
-          <div className="login-logo">
-            <div className="logo-icon">⏳</div>
-            <h1 className="text-gradient">CEO Deadline Management</h1>
-          </div>
-          <p className="login-subtitle">Please sign in</p>
+        <div className="login-header" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <img 
+            src={logo} 
+            alt="Fusion Group Logo" 
+            style={{ width: '120px', height: 'auto', marginBottom: '16px' }} 
+          />
+          <h1 className="text-gradient" style={{ fontSize: '24px', fontWeight: '800', lineHeight: '1.2' }}>CEO Deadline Management</h1>
+          <p className="login-subtitle" style={{ fontSize: '18px', fontWeight: '800', marginTop: '24px', color: 'var(--primary-accent)' }}>Please sign in</p>
         </div>
 
         {error && <div className="login-error">{error}</div>}

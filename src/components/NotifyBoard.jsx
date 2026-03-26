@@ -1,0 +1,249 @@
+import React, { useState } from 'react';
+import { Megaphone, Search, Pin, Trash2, CheckCircle, Clock, AlertCircle, Filter, Trash, Search as SearchIcon, X } from 'lucide-react';
+import { useNotify } from '../context/NotifyContext';
+import { useAuth } from '../context/AuthContext';
+import { format } from 'date-fns';
+import { enUS } from 'date-fns/locale';
+
+const NotifyBoard = () => {
+  const { currentUser } = useAuth();
+  const { notifications, markAsRead, togglePin, deleteNotification, sendNotification } = useNotify();
+  const [activeTab, setActiveTab] = useState('all'); // all, unread, pinned
+  const [search, setSearch] = useState('');
+  
+  // Compose State
+  const [showCompose, setShowCompose] = useState(false);
+  const [newContent, setNewContent] = useState('');
+  const [recipientScope, setRecipientScope] = useState('all');
+  const [isUrgent, setIsUrgent] = useState(false);
+  const [sending, setSending] = useState(false);
+
+  const handleSend = async (e) => {
+    e.preventDefault();
+    if (!newContent.trim()) return;
+    setSending(true);
+    try {
+      await sendNotification({
+        content: newContent,
+        recipients: [recipientScope],
+        type: isUrgent ? 'emergency' : 'normal',
+      });
+      setNewContent('');
+      setShowCompose(false);
+      setIsUrgent(false);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const filtered = notifications.filter(n => {
+    const matchesSearch = n.content.toLowerCase().includes(search.toLowerCase()) || 
+                         n.senderName.toLowerCase().includes(search.toLowerCase());
+    if (activeTab === 'unread') return matchesSearch && !n.readBy?.includes(currentUser.id);
+    if (activeTab === 'pinned') return matchesSearch && n.pinned;
+    return matchesSearch;
+  });
+
+  const ScopeLabel = {
+      all: 'Company Wide',
+      hanoi: 'Hanoi Branch',
+      hcm: 'HCM Branch',
+      hungyen: 'Hung Yen Branch',
+      CEOFS: 'CEO Direct'
+  };
+
+  return (
+    <div className="animate-fade-in" style={{ height: 'calc(100vh - 160px)', display: 'flex', flexDirection: 'column' }}>
+      
+      {/* Header & Controls */}
+      <div className="soft-panel" style={{ padding: '24px', borderRadius: 'var(--radius-lg)', marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-panel)' }}>
+        <div>
+          <h2 style={{ fontSize: '24px', fontWeight: '800', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Megaphone size={28} color="var(--primary-accent)" /> Notify Center
+          </h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '14px', fontWeight: '600' }}>Full announcement history & broadcast management</p>
+        </div>
+
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <div className="soft-panel" style={{ display: 'flex', alignItems: 'center', padding: '10px 16px', gap: '12px', width: '320px', border: '1px solid var(--border-light)', marginBottom: 0 }}>
+            <SearchIcon size={18} color="var(--text-muted)" />
+            <input 
+              type="text" 
+              placeholder="Search history..." 
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%', fontSize: '14px', fontWeight: '600' }}
+            />
+          </div>
+          {currentUser.canSendNotify && (
+            <button className="btn-primary" onClick={() => setShowCompose(true)} style={{ padding: '12px 24px', gap: '10px' }}>
+              <Megaphone size={18} /> Broadcast
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Compose Modal */}
+      {showCompose && (
+        <div className="modal-overlay animate-fade-in" style={{ zIndex: 3000 }}>
+          <div className="modal-content animate-slide-up" style={{ width: '500px', padding: '0', overflow: 'hidden' }}>
+            <div style={{ padding: '24px', background: 'var(--primary-accent)', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+               <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>New Announcement</h3>
+               <button onClick={() => setShowCompose(false)} style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer' }}><X size={24}/></button>
+            </div>
+            
+            <form onSubmit={handleSend} style={{ padding: '24px' }}>
+              <div className="form-group" style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '800', fontSize: '14px' }}>Target Audience</label>
+                <select 
+                  value={recipientScope} 
+                  onChange={e => setRecipientScope(e.target.value)}
+                  style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid var(--border-light)', outline: 'none', background: 'white' }}
+                >
+                  <option value="all">Entire Company (Global)</option>
+                  {currentUser.allowedLocations.map(loc => (
+                    <option key={loc} value={loc}>{loc.toUpperCase()} Region</option>
+                  ))}
+                  {currentUser.id !== 'CEOFS' && <option value="CEOFS">CEO (Direct)</option>}
+                </select>
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '800', fontSize: '14px' }}>Message Content</label>
+                <textarea 
+                  value={newContent}
+                  onChange={e => setNewContent(e.target.value)}
+                  placeholder="Type your announcement here..."
+                  style={{ width: '100%', height: '150px', padding: '16px', borderRadius: '12px', border: '1px solid var(--border-light)', outline: 'none', resize: 'none', fontSize: '15px' }}
+                  autoFocus
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontWeight: '700', fontSize: '14px', color: isUrgent ? '#ef4444' : 'var(--text-muted)' }}>
+                  <input type="checkbox" checked={isUrgent} onChange={e => setIsUrgent(e.target.checked)} />
+                  <AlertCircle size={18} /> Emergency
+                </label>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button type="button" className="btn-secondary" onClick={() => setShowCompose(false)}>Cancel</button>
+                  <button type="submit" className="btn-primary" disabled={sending || !newContent.trim()}>
+                    {sending ? 'Sending...' : 'Post Now'}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: 'flex', gap: '28px', flex: 1, overflow: 'hidden' }}>
+        
+        {/* Navigation / Filters Sidebar */}
+        <div style={{ width: '220px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+           {[
+             { id: 'all', label: 'All Notices', icon: Megaphone },
+             { id: 'unread', label: 'Unread', icon: Clock },
+             { id: 'pinned', label: 'Pinned', icon: Pin },
+           ].map(tab => (
+             <button 
+               key={tab.id}
+               onClick={() => setActiveTab(tab.id)}
+               className={`btn-ghost ${activeTab === tab.id ? 'active' : ''}`}
+               style={{ justifyContent: 'flex-start', padding: '12px 16px', gap: '12px' }}
+             >
+               <tab.icon size={18} />
+               <span>{tab.label}</span>
+               {tab.id === 'unread' && notifications.filter(n => !n.readBy?.includes(currentUser.id)).length > 0 && (
+                 <span style={{ marginLeft: 'auto', background: '#ef4444', color: 'white', fontSize: '10px', fontWeight: '800', padding: '2px 6px', borderRadius: '10px' }}>
+                   {notifications.filter(n => !n.readBy?.includes(currentUser.id)).length}
+                 </span>
+               )}
+             </button>
+           ))}
+        </div>
+
+        {/* History List */}
+        <div className="soft-panel" style={{ flex: 1, background: 'var(--bg-panel)', borderRadius: 'var(--radius-lg)', padding: '28px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+           {filtered.length === 0 ? (
+             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', gap: '16px' }}>
+               <Megaphone size={60} opacity={0.1} />
+               <p style={{ fontWeight: '600' }}>No announcements matching your criteria</p>
+             </div>
+           ) : (
+             <div style={{ flex: 1, overflowY: 'auto', paddingRight: '12px' }} className="custom-scrollbar">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {filtered.map(n => {
+                    const isUnread = !n.readBy?.includes(currentUser.id);
+                    const dt = n.createdAt?.toDate ? n.createdAt.toDate() : new Date();
+                    
+                    return (
+                      <div 
+                        key={n.id} 
+                        className={`notify-board-item ${n.type === 'emergency' ? 'emergency' : ''} ${isUnread ? 'unread' : ''}`}
+                        onClick={() => isUnread && markAsRead(n.id)}
+                        style={{
+                          padding: '20px',
+                          background: isUnread ? 'var(--primary-pastel)' : 'var(--bg-main)',
+                          borderRadius: '16px',
+                          border: isUnread ? '1px solid var(--primary-accent)' : '1px solid var(--border-light)',
+                          transition: 'all 0.2s',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div style={{ width: '44px', height: '44px', background: 'white', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: n.type === 'emergency' ? '#ef4444' : 'var(--primary-accent)', boxShadow: '0 4px 12px rgba(0,0,0,0.04)' }}>
+                               {n.type === 'emergency' ? <AlertCircle size={22} /> : <Megaphone size={22} />}
+                            </div>
+                            <div>
+                               <h4 style={{ margin: 0, fontSize: '15px', fontWeight: '800', color: 'var(--text-primary)' }}>{n.senderName}</h4>
+                               <p style={{ margin: 0, fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{n.senderTitle} · {ScopeLabel[n.recipients[0]] || 'Direct'}</p>
+                            </div>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                             <p style={{ margin: 0, fontSize: '12px', fontWeight: '700', color: 'var(--text-secondary)' }}>{format(dt, 'MMM dd, HH:mm', { locale: enUS })}</p>
+                             {isUnread && <span style={{ fontSize: '10px', color: 'white', background: 'var(--primary-accent)', padding: '2px 8px', borderRadius: 'var(--radius-full)', fontWeight: '800', marginTop: '4px', display: 'inline-block' }}>NEW</span>}
+                          </div>
+                        </div>
+
+                        <div style={{ paddingLeft: '56px' }}>
+                          <p style={{ fontSize: '15px', lineHeight: '1.6', color: 'var(--text-primary)', fontWeight: '500', whiteSpace: 'pre-wrap' }}>{n.content}</p>
+                          
+                          <div style={{ marginTop: '16px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                             {currentUser.canSendNotify && (
+                               <button 
+                                 className="btn-ghost-mini" 
+                                 onClick={(e) => { e.stopPropagation(); togglePin(n.id, n.pinned); }}
+                                 style={{ color: n.pinned ? 'var(--primary-accent)' : undefined }}
+                               >
+                                 <Pin size={14} fill={n.pinned ? 'currentColor' : 'none'} /> {n.pinned ? 'Pinned' : 'Pin'}
+                               </button>
+                             )}
+                             {(n.senderId === currentUser.id || currentUser.id === 'CEOFS') && (
+                               <button 
+                                 className="btn-ghost-mini" 
+                                 onClick={(e) => { e.stopPropagation(); deleteNotification(n.id); }}
+                                 style={{ color: '#ef4444' }}
+                               >
+                                 <Trash size={14} /> Delete
+                               </button>
+                             )}
+                             {!isUnread && <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '700', marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '4px' }}><CheckCircle size={14} /> Read</span>}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+             </div>
+           )}
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+export default NotifyBoard;
