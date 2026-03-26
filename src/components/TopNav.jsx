@@ -5,6 +5,7 @@ import { enUS } from 'date-fns/locale';
 import { useEvents } from '../context/EventContext';
 import { useAuth } from '../context/AuthContext';
 import SettingsModal from './SettingsModal';
+import ProfileModal from './ProfileModal';
 
 const TopNav = ({ onMenuClick }) => {
   const today = new Date();
@@ -12,6 +13,8 @@ const TopNav = ({ onMenuClick }) => {
   const { currentUser, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [profileMode, setProfileMode] = useState('view');
 
   return (
     <header className="top-nav" style={{ marginBottom: '24px', position: 'relative' }}>
@@ -122,12 +125,12 @@ const TopNav = ({ onMenuClick }) => {
                 <span>Settings</span>
               </button>
               
-              <button className="user-dropdown-item" onClick={() => setIsDropdownOpen(false)}>
+              <button className="user-dropdown-item" onClick={() => { setProfileMode('view'); setIsProfileOpen(true); setIsDropdownOpen(false); }}>
                 <User size={16} />
                 <span>Personal Info</span>
               </button>
 
-              <button className="user-dropdown-item" onClick={() => setIsDropdownOpen(false)}>
+              <button className="user-dropdown-item" onClick={() => { setProfileMode('edit'); setIsProfileOpen(true); setIsDropdownOpen(false); }}>
                 <Edit3 size={16} />
                 <span>Change Name</span>
               </button>
@@ -148,6 +151,7 @@ const TopNav = ({ onMenuClick }) => {
       </div>
       
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} initialMode={profileMode} />
     </header>
   );
 };

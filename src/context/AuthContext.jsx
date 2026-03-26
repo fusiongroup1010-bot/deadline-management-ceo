@@ -46,24 +46,26 @@ export function AuthProvider({ children }) {
   }, []);
 
   function login(userId, password = '') {
-    return new Promise((resolve, reject) => {
-      if (userId.toLowerCase() === 'guest') {
-        const guest = EMPLOYEES.find(e => e.id === 'Guest');
-        setCurrentUser(guest);
-        localStorage.setItem('mockUser', JSON.stringify(guest));
-        resolve(guest);
-        return;
-      }
-      
-      const user = EMPLOYEES.find(e => e.id.toLowerCase() === userId.toLowerCase());
-      if (user && user.pass === password) {
-        setCurrentUser(user);
-        localStorage.setItem('mockUser', JSON.stringify(user));
-        resolve(user);
-      } else {
-        reject(new Error('Incorrect ID or password!'));
-      }
-    });
+    const targetUserId = userId === 'Guest' ? 'Guest' : userId;
+    const user = EMPLOYEES.find(e => e.id.toLowerCase() === targetUserId.toLowerCase());
+    
+    if (user && (user.role === 'guest' || user.pass === password)) {
+      const storedName = localStorage.getItem(`name_${user.id}`);
+      const sessionUser = { ...user, name: storedName || user.name };
+      setCurrentUser(sessionUser);
+      localStorage.setItem('mockUser', JSON.stringify(sessionUser));
+      return Promise.resolve(sessionUser);
+    }
+    return Promise.reject(new Error('Incorrect ID or password!'));
+  }
+
+  function updateProfile(newName) {
+    if (!currentUser) return;
+    const updated = { ...currentUser, name: newName };
+    setCurrentUser(updated);
+    localStorage.setItem('mockUser', JSON.stringify(updated));
+    localStorage.setItem(`name_${currentUser.id}`, newName);
+    return Promise.resolve(updated);
   }
 
   function logout() {
@@ -76,6 +78,7 @@ export function AuthProvider({ children }) {
     currentUser,
     login,
     logout,
+    updateProfile,
     loading
   };
 
