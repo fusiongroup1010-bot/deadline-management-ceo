@@ -3,19 +3,22 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const AuthContext = createContext();
 
 export const EMPLOYEES = [
-  { id: 'TraRD', name: 'Tra', department: 'R&D', role: 'admin', pass: 'Tra123@' },
-  { id: 'NgaMedia', name: 'Nga', department: 'Media MKT', role: 'admin', pass: 'Nga345@' },
-  { id: 'LAnhMedia', name: 'Lan Anh', department: 'Media MKT', role: 'admin', pass: 'LA123!' },
-  { id: 'ThaoMedia', name: 'Thao', department: 'Media MKT', role: 'admin', pass: 'Thao123#' },
-  { id: 'TrangMedia', name: 'Trang', department: 'Media MKT', role: 'admin', pass: 'Trang345@' },
-  { id: 'NiQC', name: 'Ni', department: 'QC', role: 'admin', pass: 'Ni345!' },
-  { id: 'TaiQC', name: 'Tai', department: 'QC', role: 'admin', pass: 'Tai123!' },
-  { id: 'LinhQC', name: 'Linh', department: 'QC', role: 'admin', pass: 'Linh123$' },
-  { id: 'NinhEvolution', name: 'Ninh', department: 'Evolution', role: 'admin', pass: 'Ninh456' },
-  { id: 'MunFD', name: 'Mr Mun', department: 'FD', role: 'admin', pass: 'MunFS123' },
-  { id: 'LeeCPO', name: 'Mr Lee', department: 'CPO', role: 'admin', pass: 'LeeFS456' },
-  { id: 'vetnam@fusiongroup.vn', name: 'Nam R&D Head', department: 'R&D', role: 'admin', pass: 'tndmltk6211#' },
-  { id: 'Guest', name: 'Guest Mode (View Only)', department: 'Guest', role: 'guest' }
+  { id: 'DMHuong', name: 'Huong', role: 'admin', pass: 'DMHFS123' },
+  { id: 'Trangxu', name: 'Trang Xu', role: 'admin', pass: 'TrangX345!' },
+  { id: 'Trangsam', name: 'Trang Sam', role: 'admin', pass: 'TrangS345@' },
+  { id: 'DungAd', name: 'Dung Admin', role: 'admin', pass: 'Dung123!' },
+  { id: 'ThuyAC', name: 'Thuy Acc', role: 'admin', pass: 'Thuy123#' },
+  { id: 'PhucMKT', name: 'Phuc MKT', role: 'admin', pass: 'Phuc345@' },
+  { id: 'MenPUR', name: 'Men PUR', role: 'admin', pass: 'Men345!' },
+  { id: 'LinhVuHR', name: 'Linh Vu HR', role: 'admin', pass: 'Thathu123!' },
+  { id: 'LienLOG', name: 'Lien LOG', role: 'admin', pass: 'Lien123$' },
+  { id: 'PAnh', name: 'P Anh', role: 'admin', pass: 'PAnh456' },
+  { id: 'JiHK', name: 'Ji HK', role: 'admin', pass: 'JHKFS123' },
+  { id: 'HCMLOG', name: 'HCM LOG', role: 'admin', pass: 'HCM456' },
+  { id: 'HCMMKT', name: 'HCM MKT', role: 'admin', pass: 'HCM6211#' },
+  { id: 'HCMHR', name: 'HCM HR', role: 'admin', pass: 'HCMHR111!' },
+  { id: 'HCMTra', name: 'HCM Tra', role: 'admin', pass: 'Tra112!' },
+  { id: 'Guest', name: 'Guest Mode (View Only)', role: 'guest' }
 ];
 
 export function useAuth() {
