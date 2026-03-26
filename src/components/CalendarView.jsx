@@ -1,0 +1,423 @@
+import React, { useState, useEffect } from 'react';
+import { Plus, Users, MoreHorizontal, Edit2, Trash2, ChevronLeft } from 'lucide-react';
+import { format, startOfWeek, addDays, isSameDay, differenceInCalendarDays } from 'date-fns';
+import { enUS } from 'date-fns/locale';
+import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/dist/style.css';
+import { useEvents, CATEGORY_MAP } from '../context/EventContext';
+import { useAuth } from '../context/AuthContext';
+
+const START_HOUR = 9;
+const HOURS_COUNT = 9; // 9 AM → 5 PM (17:00)
+
+const CATEGORY_LIST = Object.entries(CATEGORY_MAP).map(([id, v]) => ({ id, ...v }));
+
+/* ── Convert a unified item to a calendar slot (returns null if not in view week or no time) ── */
+const toCalSlot = (item, weekStart) => {
+  if (!item.dueDate || !item.dueTime) return null;
+  const startDate = new Date(item.dueDate + 'T00:00:00');
+  const endDateStr = item.endDate || item.dueDate;
+  const endDate = new Date(endDateStr + 'T00:00:00');
+  
+  const startDayIndex = differenceInCalendarDays(startDate, weekStart);
+  const endDayIndex = differenceInCalendarDays(endDate, weekStart);
+  
+  if (endDayIndex < 0 || startDayIndex > 6) return null;
+
+  const clampedStart = Math.max(0, startDayIndex);
+  const clampedEnd = Math.min(6, endDayIndex);
+  const spanDays = clampedEnd - clampedStart + 1;
+
+  const [h, m] = item.dueTime.split(':').map(Number);
+  const start = h + m / 60;
+  const cat = CATEGORY_MAP[item.categoryId] || CATEGORY_MAP.rd;
+  return { ...item, day: clampedStart, spanDays, start, color: cat.color, text: cat.text };
+};
+
+/* ── Event Card with hover ... dropdown ── */
+const EventCard = ({ event, topPos, height, leftPos, width, onEdit, onDelete, onOpen, isGuest }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const fmt = (h) => {
+    const hours = Math.floor(h);
+    const minutes = Math.round((h - hours) * 60);
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  };
+
+  const TYPE_LABEL = { meeting: '📅', task: '✅', report: '📊' };
+
+  return (
+    <div
+      className="event-card"
+      style={{
+        top: `${topPos}%`, left: leftPos, width: width,
+        height: `calc(${height}% - 2px)`,
+        minHeight: '76px',
+        zIndex: 15,
+        background: event.color, color: event.text, borderColor: event.text,
+        position: 'absolute', overflow: 'visible'
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => { setIsHovered(false); setMenuOpen(false); }}
+      onClick={() => { if(!isGuest) onOpen(); }}
+    >
+      {/* Title + ... button */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '4px' }}>
+        <div className="event-title" style={{ flex: 1 }}>
+          {TYPE_LABEL[event.type] || ''} {event.title}
+        </div>
+        {!isGuest && (
+          <div style={{ position: 'relative', flexShrink: 0 }}>
+            <button
+              onClick={(e) => { e.stopPropagation(); setMenuOpen(p => !p); }}
+              style={{
+                width: '20px', height: '20px', border: 'none',
+                background: menuOpen ? 'rgba(0,0,0,0.12)' : (isHovered ? 'rgba(0,0,0,0.08)' : 'transparent'),
+                borderRadius: '6px', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'inherit', opacity: isHovered || menuOpen ? 1 : 0,
+                transition: 'opacity 0.2s ease', padding: 0,
+              }}
+            >
+              <MoreHorizontal size={14} />
+            </button>
+            {menuOpen && (
+              <div
+                onClick={e => e.stopPropagation()}
+                style={{
+                  position: 'absolute', top: '24px', right: 0,
+                  background: 'var(--bg-panel)', border: '1px solid var(--border-light)',
+                  borderRadius: '12px', boxShadow: '0 12px 36px rgba(0,0,0,0.14)',
+                  padding: '6px', zIndex: 1000, minWidth: '160px',
+                  animation: 'popIn 0.2s cubic-bezier(0.16,1,0.3,1)',
+                }}
+              >
+                <div className="context-menu-item" onClick={() => { onEdit(); setMenuOpen(false); }}>
+                  <Edit2 size={14} /> Edit Task
+                </div>
+                <div className="context-menu-item delete" onClick={() => { onDelete(); setMenuOpen(false); }}>
+                  <Trash2 size={14} /> Delete Task
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      {/* Time & Dates */}
+      <div style={{ fontSize: '9px', fontWeight: '700', marginTop: '2px', opacity: 0.9 }}>
+        {fmt(event.start)} – {fmt(event.start + event.duration)}
+        {event.spanDays > 1 && (
+          <div style={{ marginTop: '2px', opacity: 0.8 }}>
+            Multiple days: {event.spanDays} days
+          </div>
+        )}
+      </div>
+
+      {/* Status Badge */}
+      {(() => {
+        let text = '';
+        let bgColor = '';
+        const todayStr = new Date().toISOString().split('T')[0];
+        
+        if (event.status === 'done') {
+          text = 'Done';
+          bgColor = '#7c3aed'; // purple
+        } else if (event.status === 'in-progress') {
+          text = 'In progress';
+          bgColor = '#2563eb'; // blue
+        } else if (event.status === 'todo' && event.dueDate && event.dueDate < todayStr) {
+          text = 'Overdue';
+          bgColor = '#ef4444'; // red
+        }
+
+        if (!text) return null;
+
+        return (
+          <div style={{
+            position: 'absolute',
+            bottom: '4px',
+            right: '4px',
+            backgroundColor: bgColor,
+            color: '#ffffff',
+            fontSize: '10px',
+            fontWeight: '800',
+            padding: '2px 8px',
+            borderRadius: '6px',
+            zIndex: 2,
+          }}>
+            {text}
+          </div>
+        );
+      })()}
+
+      {/* Tracking info */}
+      {event.updatedBy && (
+        <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid rgba(0,0,0,0.1)', fontSize: '9px', fontWeight: '600' }}>
+          Edited by <strong>{event.updatedBy}</strong>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ── Main CalendarView ── */
+const CalendarView = () => {
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const { events, openEditModal, deleteEvent, updateEvent, openAddModal } = useEvents();
+  const { currentUser } = useAuth();
+  const isGuest = currentUser?.role === 'guest';
+
+  // Active category filter
+  const [activeCategories, setActiveCategories] = useState(
+    () => Object.fromEntries(CATEGORY_LIST.map(c => [c.id, true]))
+  );
+  const [internalSidebarOpen, setInternalSidebarOpen] = useState(true);
+  const [gridZoom, setGridZoom] = useState(240); // Initial day width in px
+
+  const toggleCat = (id) => setActiveCategories(p => ({ ...p, [id]: !p[id] }));
+
+  const editTitle = (item) => {
+    const t = window.prompt('Edit title:', item.title);
+    if (t && t.trim()) updateEvent({ ...item, title: t });
+  };
+
+  const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = addDays(weekStart, i);
+    return { name: format(d, 'EEE', { locale: enUS }), date: format(d, 'd'), fullDate: d };
+  });
+  const hours = Array.from({ length: HOURS_COUNT }, (_, i) => i + START_HOUR);
+
+  // Compute calendar slots from unified items
+  const calSlots = events
+    .filter(e => activeCategories[e.categoryId])
+    .map(e => toCalSlot(e, weekStart))
+    .filter(Boolean)
+    .filter(s => s.start >= START_HOUR && s.start < START_HOUR + HOURS_COUNT);
+
+  return (
+    <div style={{ padding: '0 40px 24px' }} className="animate-fade-in calendar-page-root">
+      <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 style={{ fontSize: '26px', fontWeight: '800', marginBottom: '8px', color: 'var(--text-primary)' }}>Calendar Planner</h1>
+          <p style={{ color: 'var(--text-secondary)', fontWeight: '600', fontSize: '15px' }}>
+            Showing tasks & meetings for week of {format(weekStart, 'MMM d', { locale: enUS })}.
+          </p>
+        </div>
+        {/* Main Menu Sidebar toggle (from props) */}
+        <button 
+          className="sidebar-toggle-mobile"
+          style={{ display: 'none' }} 
+          onClick={() => {
+            const sb = document.querySelector('.sidebar');
+            if (sb) sb.classList.toggle('active');
+          }}
+        >
+          <MoreHorizontal />
+        </button>
+      </div>
+
+      <div className="calendar-container">
+        {/* Toggle Internal Sidebar Button (Date section) */}
+        <button 
+          onClick={() => setInternalSidebarOpen(!internalSidebarOpen)}
+          className="internal-sidebar-toggle"
+          style={{
+            position: 'absolute', left: internalSidebarOpen ? '270px' : '0px', top: '10px',
+            zIndex: 110, background: 'var(--bg-panel)', border: '1px solid var(--border-light)',
+            padding: '5px', borderRadius: '50%', cursor: 'pointer', boxShadow: 'var(--shadow-soft)',
+            transition: 'all 0.3s ease', display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}
+          title={internalSidebarOpen ? "Hide Filter" : "Show Filter"}
+        >
+          {internalSidebarOpen ? <ChevronLeft size={16} /> : <Users size={16} />}
+        </button>
+
+        {/* Internal Sidebar (Date & Filters) */}
+        <div className={`calendar-sidebar ${!internalSidebarOpen ? 'collapsed' : ''}`}>
+          {!isGuest && (
+            <button
+              style={{
+                background: 'var(--bg-main)', border: '1px solid var(--border-light)', padding: '10px 20px',
+                borderRadius: '24px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '800',
+                fontSize: '15px', color: 'var(--text-primary)', alignSelf: 'flex-start', boxShadow: 'var(--shadow-soft)', cursor: 'pointer'
+              }}
+              onClick={openAddModal}
+            >
+              <Plus size={18} strokeWidth={2.5} /> Create
+            </button>
+          )}
+
+          <div style={{ marginTop: '8px' }}>
+            <style>{`
+              .rdp { --rdp-cell-size: 24px; --rdp-accent-color: var(--blue-accent); margin: 0; }
+              .rdp-day_selected, .rdp-day_selected:focus-visible, .rdp-day_selected:hover { background-color: var(--blue-accent); color: white; }
+              .rdp-caption_label { font-size: 14px; font-weight: 800; color: var(--text-primary); }
+              .rdp-head_cell { color: var(--text-secondary); font-size: 10px; font-weight: 700; text-transform: uppercase; }
+              .rdp-day { font-size: 11px; font-weight: 600; color: var(--text-primary); border-radius: 6px; }
+              .rdp-nav_button { color: var(--text-secondary); }
+            `}</style>
+            <DayPicker mode="single" selected={selectedDate} onSelect={d => d && setSelectedDate(d)} showOutsideDays weekStartsOn={1} />
+          </div>
+
+          {/* Department filter */}
+          <div style={{ marginTop: '12px' }}>
+            <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '12px', color: 'var(--text-primary)' }}>My Calendars</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {CATEGORY_LIST.map(cat => (
+                <label key={cat.id} className="check-item" style={{
+                  cursor: 'pointer', padding: '6px 10px', borderRadius: '10px',
+                  background: activeCategories[cat.id] ? `${cat.accent}18` : 'transparent',
+                  border: `1px solid ${activeCategories[cat.id] ? cat.accent + '44' : 'transparent'}`,
+                  transition: 'all 0.2s ease', userSelect: 'none',
+                }}>
+                  <input
+                    type="checkbox" checked={activeCategories[cat.id]}
+                    onChange={() => toggleCat(cat.id)}
+                    style={{ accentColor: cat.accent, width: '15px', height: '15px' }}
+                  />
+                  <span style={{ fontSize: '13px', fontWeight: '700', color: activeCategories[cat.id] ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+                    {cat.name}
+                  </span>
+                </label>
+              ))}
+            </div>
+
+            {/* Legend */}
+            <div style={{ marginTop: '12px', padding: '10px', background: 'var(--bg-main)', borderRadius: '10px' }}>
+              <p style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', marginBottom: '6px' }}>CATEGORY</p>
+              {[{e:'📅',l:'Meeting'},{e:'✅',l:'Task'},{e:'📊',l:'Report'}].map(({e,l})=>(
+                <div key={l} style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '3px' }}>{e} {l}</div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Main Grid Scroll Area */}
+        <div className="calendar-main" id="calendar-scroll-target">
+          <div className="calendar-header-wrapper">
+             <div className="calendar-header">
+                <div className="calendar-header-corner">
+                  <span style={{ fontSize: '10px', fontWeight: '800', color: 'var(--text-muted)' }}>GMT+07</span>
+                </div>
+                {days.map((d, i) => (
+                  <div key={i} className="calendar-header-day">
+                    <span style={{ color: i === 6 ? '#f43f5e' : 'inherit' }}>{d.name}</span>
+                    <span style={{
+                      color: isSameDay(d.fullDate, selectedDate) ? 'white' : (i === 6 ? '#f43f5e' : 'inherit'),
+                      background: isSameDay(d.fullDate, selectedDate) ? (i === 6 ? '#f43f5e' : 'var(--blue-accent)') : 'transparent',
+                      width: '32px', height: '32px', lineHeight: '32px', borderRadius: '50%', display: 'inline-block', margin: '0 auto'
+                    }}>
+                      {d.date}
+                    </span>
+                  </div>
+                ))}
+              </div>
+          </div>
+
+          <div className="calendar-body-scroll">
+            <div className="calendar-grid-bg" style={{ gridTemplateRows: `repeat(${HOURS_COUNT}, 1fr)` }}>
+              {hours.map(hour => (
+                <React.Fragment key={hour}>
+                  <div className="grid-cell-time">
+                    <span>{hour.toString().padStart(2, '0')}:00</span>
+                  </div>
+                  {days.map((_, i) => <div key={i} className="grid-cell" />)}
+                </React.Fragment>
+              ))}
+            </div>
+
+            <div className="calendar-grid">
+              {calSlots.map(slot => {
+                const topPos = ((slot.start - START_HOUR) / HOURS_COUNT) * 100;
+                const durTrimmed = Math.min(slot.duration, START_HOUR + HOURS_COUNT - slot.start);
+                const height = (durTrimmed / HOURS_COUNT) * 100;
+                
+                // Use CSS variables for column widths to ensure perfect alignment even on zoom
+                const leftPos = `calc(var(--time-col-width, 80px) + ${slot.day} * ((100% - var(--time-col-width, 80px)) / 7))`;
+                const width = `calc((((100% - var(--time-col-width, 80px)) / 7) * ${slot.spanDays}) - 4px)`;
+                
+                return (
+                  <EventCard
+                    key={slot.id}
+                    event={slot}
+                    topPos={topPos} height={height} leftPos={leftPos} width={width}
+                    onEdit={() => editTitle(slot)}
+                    onDelete={() => deleteEvent(slot.id)}
+                    onOpen={() => openEditModal(slot)}
+                    isGuest={isGuest}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Zoom Control & Mini-map Overlay (Visible on Mobile) */}
+      <div className="calendar-controls-floating">
+        <div className="zoom-control-panel">
+          <span style={{ fontSize: '10px', fontWeight: '800', color: 'var(--text-muted)' }}>ZOOM</span>
+          <input 
+            type="range" 
+            min="140" 
+            max="600" 
+            value={gridZoom} 
+            onChange={(e) => {
+              const val = e.target.value;
+              setGridZoom(val);
+              document.documentElement.style.setProperty('--grid-column-weight', `${val}px`);
+            }}
+            className="zoom-slider"
+          />
+        </div>
+        <CalendarMinimap scrollSelector="#calendar-scroll-target" />
+      </div>
+    </div>
+);
+};
+
+/* ── Mini-map Component ── */
+const CalendarMinimap = ({ scrollSelector }) => {
+  const [viewport, setViewport] = useState({ top: 0, left: 0, width: 100, height: 100 });
+
+  useEffect(() => {
+    const el = document.querySelector(scrollSelector);
+    if (!el) return;
+
+    const update = () => {
+      const { scrollTop, scrollLeft, scrollWidth, scrollHeight, clientWidth, clientHeight } = el;
+      setViewport({
+        top: (scrollTop / scrollHeight) * 100,
+        left: (scrollLeft / scrollWidth) * 100,
+        width: (clientWidth / scrollWidth) * 100,
+        height: (clientHeight / scrollHeight) * 100
+      });
+    };
+
+    el.addEventListener('scroll', update);
+    window.addEventListener('resize', update);
+    update();
+    return () => {
+      el.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, [scrollSelector]);
+
+  return (
+    <div className="calendar-minimap">
+      <div 
+        className="minimap-viewport" 
+        style={{ 
+          top: `${viewport.top}%`, 
+          left: `${viewport.left}%`, 
+          width: `${viewport.width}%`, 
+          height: `${viewport.height}%` 
+        }} 
+      />
+    </div>
+  );
+};
+
+export default CalendarView;
