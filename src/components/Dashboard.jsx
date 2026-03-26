@@ -1,7 +1,8 @@
 import React from 'react';
-import { Sparkles, Calendar, Clock, CheckCircle, ArrowRight, AlertTriangle, Users, FileText, Tag } from 'lucide-react';
+import { Sparkles, Calendar, Clock, CheckCircle, ArrowRight, AlertTriangle, Users, FileText, Tag, Sun, Sunset, Moon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useEvents, CATEGORY_MAP } from '../context/EventContext';
+import { useAuth } from '../context/AuthContext';
 import { format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 
@@ -30,7 +31,20 @@ const formatDate = (d, end) => {
 
 const Dashboard = () => {
   const { filteredItems: items, openEditModal, activeLocation } = useEvents();
+  const { currentUser } = useAuth();
   const tday = today();
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 6 && hour < 12) return { text: 'Good morning', icon: Sun, color: '#f59e0b', bg: 'linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%)', iconColor: '#d97706' };
+    if (hour >= 12 && hour < 18) return { text: 'Good afternoon', icon: Sunset, color: '#f97316', bg: 'linear-gradient(135deg, #fff7ed 0%, #fdba74 100%)', iconColor: '#ea580c' };
+    if (hour >= 18 && hour < 23) return { text: 'Good evening', icon: Moon, color: '#3b82f6', bg: 'linear-gradient(135deg, #eff6ff 0%, #93c5fd 100%)', iconColor: '#2563eb' };
+    return { text: 'Good night', icon: Sparkles, color: '#7c3aed', bg: 'linear-gradient(135deg, #f3e8ff 0%, #c084fc 100%)', iconColor: '#9333ea' };
+  };
+
+  const greet = getGreeting();
+  const GreetIcon = greet.icon;
+  const userName = currentUser?.name || 'CEO';
 
   // Current Week Filter (Monday to Sunday)
   const now = new Date();
@@ -75,24 +89,24 @@ const Dashboard = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
       {/* Greeting banner */}
       <div className="soft-panel animate-fade-in" style={{
-        background: 'linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%)',
+        background: greet.bg,
         padding: '32px', borderRadius: 'var(--radius-lg)',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        border: 'none', boxShadow: '0 12px 30px rgba(96,165,250,0.4)'
+        border: 'none', boxShadow: '0 12px 30px rgba(0,0,0,0.05)'
       }}>
         <div>
-          <h1 style={{ fontSize: '26px', fontWeight: '800', color: 'var(--primary-accent)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            Good morning, CEO! <Sparkles size={22} color="var(--primary-accent)" />
+          <h1 style={{ fontSize: '26px', fontWeight: '800', color: greet.iconColor, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {greet.text}, {userName}! <div className="greeting-icon-animate"><GreetIcon size={28} color={greet.iconColor} strokeWidth={2.5} /></div>
           </h1>
-          <p style={{ color: '#1e40af', fontSize: '15px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px' }}>
+          <p style={{ color: 'var(--text-primary)', fontSize: '15px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px' }}>
             Current Sheet: {activeLocation}
           </p>
-          <p style={{ color: '#3b82f6', fontSize: '14px', fontWeight: '600', marginTop: '4px' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '600', marginTop: '4px' }}>
             Week: {format(startOfWk, 'dd MMM')} - {format(endOfWk, 'dd MMM')} · {dueToday.length > 0 ? `${dueToday.length} item${dueToday.length>1?'s':''} due today` : 'No tasks due today'}{overdue.length > 0 ? ` · ${overdue.length} overdue` : ''}
           </p>
         </div>
         <div style={{ width: '100px', height: '100px', background: 'rgba(255,255,255,0.4)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Calendar size={54} color="var(--primary-accent)" strokeWidth={1.5} style={{ opacity: 0.8 }} />
+          <Calendar size={54} color={greet.iconColor} strokeWidth={1.5} style={{ opacity: 0.8 }} />
         </div>
       </div>
 
