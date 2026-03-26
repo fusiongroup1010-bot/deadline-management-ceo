@@ -9,6 +9,8 @@ import TaskModal from './components/TaskModal';
 import Login from './components/Login';
 import { EventProvider } from './context/EventContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { NotifyProvider } from './context/NotifyContext';
+import NotifyWindow from './components/NotifyWindow';
 
 function AppContent() {
   const { currentUser } = useAuth();
@@ -62,6 +64,7 @@ function AppContent() {
           </Routes>
         </div>
       </div>
+      <NotifyWindow />
     </div>
   );
 }
@@ -69,12 +72,14 @@ function AppContent() {
 function App() {
   return (
     <AuthProvider>
-      <EventProvider>
-        <Router>
-          <AppContent />
-          <TaskModal />
-        </Router>
-      </EventProvider>
+      <NotifyProvider>
+        <EventProvider>
+          <Router>
+            <AppContent />
+            <TaskModal />
+          </Router>
+        </EventProvider>
+      </NotifyProvider>
     </AuthProvider>
   );
 }

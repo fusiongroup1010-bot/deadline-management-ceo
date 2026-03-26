@@ -4,39 +4,39 @@ const AuthContext = createContext();
 
 export const EMPLOYEES = [
   // CEO - Access & Edit All
-  { id: 'CEOFS', name: 'CEO', role: 'admin', pass: 'CEOChoFS', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi', 'hcm', 'hungyen'] },
+  { id: 'CEOFS', name: 'CEO', role: 'admin', pass: 'CEOChoFS', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi', 'hcm', 'hungyen'], canSendNotify: true, notifyScope: 'all', title: 'CEO' },
   
   // Hanoi Authorized Staff - View All, Edit Hanoi
-  { id: 'DMHuong', name: 'Huong', role: 'admin', pass: 'DMHFS123', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'] },
-  { id: 'Trangxu', name: 'Trang Xu', role: 'admin', pass: 'TrangX345!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'] },
-  { id: 'Trangsam', name: 'Trang Sam', role: 'admin', pass: 'TrangS345@', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'] },
-  { id: 'DungAd', name: 'Dung Admin', role: 'admin', pass: 'Dung123!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'] },
-  { id: 'ThuyAC', name: 'Thuy Acc', role: 'admin', pass: 'Thuy123#', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'] },
-  { id: 'PhucMKT', name: 'Phuc MKT', role: 'admin', pass: 'Phuc345@', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'] },
-  { id: 'MenPUR', name: 'Men PUR', role: 'admin', pass: 'Men345!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'] },
-  { id: 'LinhVuHR', name: 'Linh Vu HR', role: 'admin', pass: 'Thathu123!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'] },
-  { id: 'LienLOG', name: 'Lien LOG', role: 'admin', pass: 'Lien123$', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'] },
-  { id: 'PAnh', name: 'P Anh', role: 'admin', pass: 'PAnh456', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'] },
-  { id: 'JiHK', name: 'Ji HK', role: 'admin', pass: 'JHKFS123', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'] },
+  { id: 'DMHuong', name: 'Huong', role: 'admin', pass: 'DMHFS123', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'], canSendNotify: true, notifyScope: 'restricted', title: 'Branch Manager' },
+  { id: 'Trangxu', name: 'Trang Xu', role: 'admin', pass: 'TrangX345!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'], canSendNotify: false, title: 'Staff' },
+  { id: 'Trangsam', name: 'Trang Sam', role: 'admin', pass: 'TrangS345@', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'], canSendNotify: false, title: 'Staff' },
+  { id: 'DungAd', name: 'Dung Admin', role: 'admin', pass: 'Dung123!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'], canSendNotify: false, title: 'Sale Admin' },
+  { id: 'ThuyAC', name: 'Thuy Acc', role: 'admin', pass: 'Thuy123#', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'], canSendNotify: false, title: 'Accountant' },
+  { id: 'PhucMKT', name: 'Phuc MKT', role: 'admin', pass: 'Phuc345@', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'], canSendNotify: false, title: 'MKT' },
+  { id: 'MenPUR', name: 'Men PUR', role: 'admin', pass: 'Men345!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'], canSendNotify: false, title: 'Purchasing' },
+  { id: 'LinhVuHR', name: 'Linh Vu HR', role: 'admin', pass: 'Thathu123!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'], canSendNotify: false, title: 'HR' },
+  { id: 'LienLOG', name: 'Lien LOG', role: 'admin', pass: 'Lien123$', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'], canSendNotify: false, title: 'Logistics' },
+  { id: 'PAnh', name: 'P Anh', role: 'admin', pass: 'PAnh456', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'], canSendNotify: false, title: 'Staff' },
+  { id: 'JiHK', name: 'Ji HK', role: 'admin', pass: 'JHKFS123', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hanoi'], canSendNotify: true, notifyScope: 'restricted', title: 'Branch Manager' },
   
   // HCM Authorized Staff - View All, Edit HCM
-  { id: 'HCMLOG', name: 'HCM LOG', role: 'admin', pass: 'HCM456', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hcm'] },
-  { id: 'HCMMKT', name: 'HCM MKT', role: 'admin', pass: 'HCM6211#', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hcm'] },
-  { id: 'HCMHR', name: 'HCM HR', role: 'admin', pass: 'HCMHR111!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hcm'] },
-  { id: 'HCMTra', name: 'HCM Tra', role: 'admin', pass: 'Tra112!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hcm'] },
+  { id: 'HCMLOG', name: 'HCM LOG', role: 'admin', pass: 'HCM456', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hcm'], canSendNotify: false, title: 'Logistics' },
+  { id: 'HCMMKT', name: 'HCM MKT', role: 'admin', pass: 'HCM6211#', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hcm'], canSendNotify: false, title: 'MKT' },
+  { id: 'HCMHR', name: 'HCM HR', role: 'admin', pass: 'HCMHR111!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hcm'], canSendNotify: false, title: 'HR' },
+  { id: 'HCMTra', name: 'HCM Tra', role: 'admin', pass: 'Tra112!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hcm'], canSendNotify: false, title: 'Staff' },
   
   // Hung Yen Authorized Staff - View All, Edit Hung Yen
-  { id: 'MunFD', name: 'Mun FD', role: 'admin', pass: 'MunFS123', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'] },
-  { id: 'NamRD', name: 'Nam RD', role: 'admin', pass: 'NamFS345', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'] },
-  { id: 'LeeCPO', name: 'Lee CPO', role: 'admin', pass: 'LeeFS345', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'] },
-  { id: 'LinhHR', name: 'Linh HR', role: 'admin', pass: 'Linh123!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'] },
-  { id: 'HueAC', name: 'Hue AC', role: 'admin', pass: 'Hue123#', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'] },
-  { id: 'NiQC', name: 'Ni QC', role: 'admin', pass: 'Ni345@', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'] },
-  { id: 'LinhDs', name: 'Linh Ds', role: 'admin', pass: 'LinhD345!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'] },
-  { id: 'Evolution', name: 'Evolution', role: 'admin', pass: 'EV123!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'] },
-  
+  { id: 'MunFD', name: 'Mun FD', role: 'admin', pass: 'MunFS123', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'], canSendNotify: true, notifyScope: 'restricted', title: 'Factory Director' },
+  { id: 'NamRD', name: 'Nam RD', role: 'admin', pass: 'NamFS345', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'], canSendNotify: true, notifyScope: 'restricted', title: 'R&D Head' },
+  { id: 'LeeCPO', name: 'Lee CPO', role: 'admin', pass: 'LeeFS345', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'], canSendNotify: true, notifyScope: 'restricted', title: 'CPO' },
+  { id: 'LinhHR', name: 'Linh HR', role: 'admin', pass: 'Linh123!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'], canSendNotify: false, title: 'HR' },
+  { id: 'HueAC', name: 'Hue AC', role: 'admin', pass: 'Hue123#', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'], canSendNotify: false, title: 'Accountant' },
+  { id: 'NiQC', name: 'Ni QC', role: 'admin', pass: 'Ni345@', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'], canSendNotify: false, title: 'QC' },
+  { id: 'LinhDs', name: 'Linh Ds', role: 'admin', pass: 'LinhD345!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'], canSendNotify: false, title: 'Designer' },
+  { id: 'Evolution', name: 'Evolution', role: 'admin', pass: 'EV123!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'], canSendNotify: false, title: 'Staff' },
+
   // Guest Mode
-  { id: 'Guest', name: 'Guest Mode (Global View)', role: 'guest', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: [] }
+  { id: 'Guest', name: 'Guest Mode', role: 'guest', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: [], canSendNotify: false, title: 'Guest' }
 ];
 
 export function useAuth() {
