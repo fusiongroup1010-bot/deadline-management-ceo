@@ -36,10 +36,48 @@ const Dashboard = () => {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour >= 6 && hour < 12) return { text: 'Good morning', icon: Sun, color: '#f59e0b', bg: 'linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%)', iconColor: '#d97706' };
-    if (hour >= 12 && hour < 18) return { text: 'Good afternoon', icon: Sunset, color: '#f97316', bg: 'linear-gradient(135deg, #fff7ed 0%, #fdba74 100%)', iconColor: '#ea580c' };
-    if (hour >= 18 && hour < 23) return { text: 'Good evening', icon: Moon, color: '#3b82f6', bg: 'linear-gradient(135deg, #eff6ff 0%, #93c5fd 100%)', iconColor: '#2563eb' };
-    return { text: 'Good night', icon: Sparkles, color: '#7c3aed', bg: 'linear-gradient(135deg, #f3e8ff 0%, #c084fc 100%)', iconColor: '#9333ea' };
+    // Use theme colors directly from variables if possible, but hardcoded here to ensure they match exactly
+    const blueThemeBg = 'linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%)';
+    const mainTextColor = '#1e3a8a';
+    
+    if (hour >= 6 && hour < 12) {
+      return { 
+        text: 'Good morning', 
+        icon: Sun, 
+        bg: blueThemeBg, 
+        iconColor: mainTextColor, 
+        accent: '#f59e0b', // Yellow
+        animate: 'sun-rotate'
+      };
+    }
+    if (hour >= 12 && hour < 18) {
+      return { 
+        text: 'Good afternoon', 
+        icon: Sunset, 
+        bg: blueThemeBg, 
+        iconColor: mainTextColor, 
+        accent: '#f97316', // Orange
+        animate: 'sunset-float'
+      };
+    }
+    if (hour >= 18 && hour < 23) {
+      return { 
+        text: 'Good evening', 
+        icon: Moon, 
+        bg: 'linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)', 
+        iconColor: mainTextColor, 
+        accent: '#fcd34d',
+        animate: 'sunset-float'
+      };
+    }
+    return { 
+      text: 'Good night', 
+      icon: Sparkles, 
+      bg: 'linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%)', 
+      iconColor: mainTextColor, 
+      accent: '#fcd34d',
+      animate: 'sunset-float'
+    };
   };
 
   const greet = getGreeting();
@@ -96,7 +134,7 @@ const Dashboard = () => {
       }}>
         <div>
           <h1 style={{ fontSize: '26px', fontWeight: '800', color: greet.iconColor, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {greet.text}, {userName}! <div className="greeting-icon-animate"><GreetIcon size={28} color={greet.iconColor} strokeWidth={2.5} /></div>
+            {greet.text}, {userName}!
           </h1>
           <p style={{ color: 'var(--text-primary)', fontSize: '15px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px' }}>
             Current Sheet: {activeLocation}
@@ -105,8 +143,10 @@ const Dashboard = () => {
             Week: {format(startOfWk, 'dd MMM')} - {format(endOfWk, 'dd MMM')} · {dueToday.length > 0 ? `${dueToday.length} item${dueToday.length>1?'s':''} due today` : 'No tasks due today'}{overdue.length > 0 ? ` · ${overdue.length} overdue` : ''}
           </p>
         </div>
-        <div style={{ width: '100px', height: '100px', background: 'rgba(255,255,255,0.4)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Calendar size={54} color={greet.iconColor} strokeWidth={1.5} style={{ opacity: 0.8 }} />
+        <div style={{ width: '120px', height: '120px', background: 'rgba(255,255,255,0.5)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '10px', backdropFilter: 'blur(4px)' }}>
+          <div className={greet.animate}>
+            <GreetIcon size={64} color={greet.accent} strokeWidth={1.5} style={{ filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.1))' }} />
+          </div>
         </div>
       </div>
 
