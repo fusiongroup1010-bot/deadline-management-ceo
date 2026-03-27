@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Bell, Search, Plus, Calendar as CalendarIcon, Menu, MapPin, User, Settings, LogOut, Edit3, ChevronDown } from 'lucide-react';
+import { Bell, Search, Plus, Calendar as CalendarIcon, Menu, MapPin, User, Settings, LogOut, Edit3, ChevronDown, Lock } from 'lucide-react';
 import { format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { useEvents } from '../context/EventContext';
 import { useAuth } from '../context/AuthContext';
 import SettingsModal from './SettingsModal';
 import ProfileModal from './ProfileModal';
+import PasswordModal from './PasswordModal';
 
 const TopNav = ({ onMenuClick }) => {
   const today = new Date();
@@ -14,6 +15,7 @@ const TopNav = ({ onMenuClick }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [profileMode, setProfileMode] = useState('view');
 
   return (
@@ -161,6 +163,11 @@ const TopNav = ({ onMenuClick }) => {
                 <span>Change Name</span>
               </button>
 
+              <button className="user-dropdown-item" onClick={() => { setIsPasswordOpen(true); setIsDropdownOpen(false); }}>
+                <Lock size={16} />
+                <span>Change Password</span>
+              </button>
+
               <div style={{ height: '1px', background: 'var(--border-light)', margin: '4px 0' }} />
 
               <button 
@@ -178,6 +185,7 @@ const TopNav = ({ onMenuClick }) => {
       
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
       <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} initialMode={profileMode} />
+      <PasswordModal isOpen={isPasswordOpen} onClose={() => setIsPasswordOpen(false)} />
     </header>
   );
 };

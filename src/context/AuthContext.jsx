@@ -59,7 +59,11 @@ export function AuthProvider({ children }) {
     const targetUserId = userId === 'Guest' ? 'Guest' : userId;
     const user = EMPLOYEES.find(e => e.id.toLowerCase() === targetUserId.toLowerCase());
     
-    if (user && (user.role === 'guest' || user.pass === password)) {
+    if (user) {
+      const savedPass = localStorage.getItem(`pass_${user.id}`);
+      const validPass = savedPass || user.pass;
+      
+      if (user.role === 'guest' || validPass === password) {
       const savedName = localStorage.getItem(`name_${user.id}`);
       const savedDept = localStorage.getItem(`dept_${user.id}`);
       const savedAddr = localStorage.getItem(`addr_${user.id}`);
@@ -76,6 +80,7 @@ export function AuthProvider({ children }) {
       setCurrentUser(sessionUser);
       localStorage.setItem('mockUser', JSON.stringify(sessionUser));
       return Promise.resolve(sessionUser);
+      }
     }
     return Promise.reject(new Error('Incorrect ID or password!'));
   }
@@ -101,11 +106,34 @@ export function AuthProvider({ children }) {
     return Promise.resolve();
   }
 
+  function changePassword(oldPassword, newPassword) {
+    if (!currentUser) return Promise.reject(new Error('Not logged in'));
+    
+    // Check old password
+    const savedPass = localStorage.getItem(`pass_${currentUser.id}`);
+    const currentValidPass = savedPass || currentUser.pass;
+    
+    if (oldPassword !== currentValidPass && currentUser.role !== 'guest') {
+       return Promise.reject(new Error('Incorrect current password'));
+    }
+    
+    // Save new password
+    localStorage.setItem(`pass_${currentUser.id}`, newPassword);
+    
+    // Also save in user object if memory state needs it, but we use localStorage directly for checks
+    const updated = { ...currentUser, pass: newPassword };
+    setCurrentUser(updated);
+    localStorage.setItem('mockUser', JSON.stringify(updated));
+    
+    return Promise.resolve();
+  }
+
   const value = {
     currentUser,
     login,
     logout,
     updateProfile,
+    changePassword,
     loading
   };
 
