@@ -107,9 +107,48 @@ const Dashboard = () => {
           <h1 style={{ fontSize: '26px', fontWeight: '800', color: greet.iconColor, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
             {greet.text}, {userName}!
           </h1>
-          <p style={{ color: 'var(--text-primary)', fontSize: '15px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px' }}>
-            Current Sheet: {activeLocation}
-          </p>
+          {/* Brand Showcase - replaces Current Sheet label */}
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '20px', marginBottom: '6px', flexWrap: 'wrap' }}>
+            {/* SAY ALo */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
+              <span style={{ fontSize: '10px', fontWeight: '700', color: greet.iconColor, letterSpacing: '1.5px', textTransform: 'uppercase', opacity: 0.6, marginBottom: '1px' }}>SAY</span>
+              <span style={{ fontSize: '28px', fontWeight: '900', color: '#cc1515', fontFamily: 'Georgia, serif', letterSpacing: '-0.5px', lineHeight: 1 }}>
+                AL<span style={{ fontSize: '32px', fontStyle: 'italic' }}>o</span>
+                <span style={{ fontSize: '10px', fontWeight: '700', color: '#cc1515', verticalAlign: 'super', marginLeft: '1px' }}>®</span>
+              </span>
+              <span style={{ fontSize: '9px', fontWeight: '700', color: '#cc1515', letterSpacing: '0.5px', fontStyle: 'italic', marginTop: '1px', opacity: 0.85 }}>Taste the difference</span>
+            </div>
+
+            {/* HOW Today's */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
+              <span style={{ fontSize: '10px', fontWeight: '700', color: greet.iconColor, letterSpacing: '1.5px', textTransform: 'uppercase', opacity: 0.6, marginBottom: '1px' }}>HOW</span>
+              <span style={{ fontSize: '28px', fontWeight: '800', color: '#d4880a', fontFamily: 'Georgia, serif', letterSpacing: '-0.5px', lineHeight: 1 }}>
+                Today<span style={{ color: '#d4880a' }}>'</span>s
+                <span style={{ fontSize: '10px', fontWeight: '700', color: '#d4880a', verticalAlign: 'super', marginLeft: '1px' }}>®</span>
+              </span>
+              <span style={{ fontSize: '9px', fontWeight: '700', color: '#d4880a', letterSpacing: '0.5px', fontStyle: 'italic', marginTop: '1px', opacity: 0.85 }}>Designed for Pets</span>
+            </div>
+
+            {/* FEEL FINE */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
+              <span style={{ fontSize: '10px', fontWeight: '700', color: greet.iconColor, letterSpacing: '1.5px', textTransform: 'uppercase', opacity: 0.6, marginBottom: '1px' }}>FEEL</span>
+              <span style={{ fontSize: '28px', fontWeight: '900', color: '#2e7d32', fontFamily: 'Impact, Arial Black, sans-serif', letterSpacing: '1px', lineHeight: 1 }}>
+                FINE
+                <span style={{ fontSize: '10px', fontWeight: '700', color: '#2e7d32', verticalAlign: 'super', marginLeft: '1px' }}>®</span>
+              </span>
+              <span style={{ fontSize: '9px', fontWeight: '700', color: '#2e7d32', letterSpacing: '0.5px', fontStyle: 'italic', marginTop: '1px', opacity: 0.85 }}>From Nature</span>
+            </div>
+
+            {/* AND Merci */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
+              <span style={{ fontSize: '10px', fontWeight: '700', color: greet.iconColor, letterSpacing: '1.5px', textTransform: 'uppercase', opacity: 0.6, marginBottom: '1px' }}>AND</span>
+              <span style={{ fontSize: '28px', fontWeight: '800', color: '#e07b18', fontFamily: 'Georgia, serif', letterSpacing: '0px', lineHeight: 1 }}>
+                Merci
+                <span style={{ fontSize: '9px', fontWeight: '700', color: '#e07b18', verticalAlign: 'super', marginLeft: '1px' }}>®</span>
+              </span>
+              <span style={{ fontSize: '9px', fontWeight: '700', color: '#e07b18', letterSpacing: '0.5px', fontStyle: 'italic', marginTop: '1px', opacity: 0.85 }}>Pure taste</span>
+            </div>
+          </div>
           <p style={{ color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '600', marginTop: '4px' }}>
             Week: {format(startOfWk, 'dd MMM')} - {format(endOfWk, 'dd MMM')} · {dueToday.length > 0 ? `${dueToday.length} item${dueToday.length>1?'s':''} due today` : 'No tasks due today'}{overdue.length > 0 ? ` · ${overdue.length} overdue` : ''}
           </p>
