@@ -69,6 +69,24 @@ export const EventProvider = ({ children }) => {
     }
   }, [currentUser]);
 
+  // Change app background color when activeLocation changes
+  useEffect(() => {
+    const BG_MAP = {
+      hanoi:   { bg: '#eef6ff', panel: '#f8fbff', border: 'rgba(59,130,246,0.08)' },
+      hcm:     { bg: '#fff0f7', panel: '#fff8fd', border: 'rgba(236,72,153,0.08)' },
+      hungyen: { bg: '#f5f3ff', panel: '#faf9ff', border: 'rgba(139,92,246,0.08)' },
+    };
+    const theme = BG_MAP[activeLocation] || BG_MAP.hanoi;
+    const root = document.documentElement;
+    // Only override if user hasn't manually set a custom bg
+    const userBg = localStorage.getItem('bgColor');
+    if (!userBg) {
+      root.style.setProperty('--bg-main', theme.bg);
+      root.style.setProperty('--bg-panel-hover', theme.panel);
+      root.style.setProperty('--border-light', theme.border);
+    }
+  }, [activeLocation]);
+
   // Sync with Firestore
   useEffect(() => {
     const q = query(collection(db, 'deadline_items_ceo'), orderBy('dueDate', 'asc'));

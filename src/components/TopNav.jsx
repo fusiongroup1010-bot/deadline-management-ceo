@@ -27,51 +27,57 @@ const TopNav = ({ onMenuClick }) => {
       </button>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: 1 }}>
-        {/* Location Switcher Tabs - Filtered by user permissions */}
+        {/* Location Switcher - 3 compact rectangle cards */}
         <div style={{ 
           display: 'flex', 
-          background: 'var(--bg-main)', 
-          padding: '4px', 
-          borderRadius: '14px',
-          border: '1px solid var(--border-light)',
-          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)',
-          flex: 1, 
-          overflow: 'hidden'
+          gap: '8px',
+          alignItems: 'center',
         }}>
-          {['hanoi', 'hcm', 'hungyen'].filter(loc => currentUser?.allowedLocations?.includes(loc)).map((loc, index, arr) => {
-            const colors = {
-              hanoi: { bg: '#e0f2fe', text: '#0369a1', shadow: 'rgba(186, 230, 253, 0.5)' },
-              hcm: { bg: '#fce7f3', text: '#be185d', shadow: 'rgba(252, 231, 243, 0.5)' },
-              hungyen: { bg: '#f3e8ff', text: '#7e22ce', shadow: 'rgba(243, 232, 255, 0.5)' }
+          {['hanoi', 'hcm', 'hungyen'].filter(loc => currentUser?.allowedLocations?.includes(loc)).map((loc) => {
+            const LOCATION_THEME = {
+              hanoi:   { activeBg: '#dbeafe', activeText: '#1e40af', activeBorder: '#93c5fd', icon: '🏙️', label: 'Hà Nội',  shadow: 'rgba(59,130,246,0.18)' },
+              hcm:     { activeBg: '#fce7f3', activeText: '#be185d', activeBorder: '#f9a8d4', icon: '🌆', label: 'HCM',      shadow: 'rgba(236,72,153,0.18)' },
+              hungyen: { activeBg: '#ede9fe', activeText: '#6d28d9', activeBorder: '#c4b5fd', icon: '🏭', label: 'Hưng Yên', shadow: 'rgba(139,92,246,0.18)' },
             };
+            const theme = LOCATION_THEME[loc];
             const isActive = activeLocation === loc;
 
             return (
-              <React.Fragment key={loc}>
-                {index > 0 && <div style={{ width: '1px', background: 'var(--border-light)', height: '20px', alignSelf: 'center' }} />}
-                <button
-                  onClick={() => setActiveLocation(loc)}
-                  style={{
-                    flex: 1, 
-                    padding: '8px 12px',
-                    borderRadius: '10px',
-                    fontSize: '13px',
-                    fontWeight: '800',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.4px',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    background: isActive ? colors[loc].bg : 'transparent',
-                    color: isActive ? colors[loc].text : 'var(--text-muted)',
-                    boxShadow: isActive ? `0 4px 12px ${colors[loc].shadow}` : 'none',
-                    cursor: currentUser?.allowedLocations?.length > 1 ? 'pointer' : 'default',
-                    whiteSpace: 'nowrap',
-                    border: 'none',
-                    margin: '0 2px'
-                  }}
-                >
-                  {loc}
-                </button>
-              </React.Fragment>
+              <button
+                key={loc}
+                onClick={() => setActiveLocation(loc)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '7px 16px',
+                  borderRadius: '12px',
+                  fontSize: '12px',
+                  fontWeight: '800',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                  background: isActive ? theme.activeBg : 'var(--bg-panel)',
+                  color: isActive ? theme.activeText : 'var(--text-muted)',
+                  border: `1.5px solid ${isActive ? theme.activeBorder : 'var(--border-light)'}`,
+                  boxShadow: isActive ? `0 4px 14px ${theme.shadow}` : 'var(--shadow-soft)',
+                  cursor: currentUser?.allowedLocations?.length > 1 ? 'pointer' : 'default',
+                  whiteSpace: 'nowrap',
+                  transform: isActive ? 'translateY(-1px)' : 'none',
+                  minWidth: '90px',
+                  justifyContent: 'center',
+                }}
+              >
+                <span style={{ fontSize: '14px', lineHeight: 1 }}>{theme.icon}</span>
+                <span>{theme.label}</span>
+                {isActive && (
+                  <span style={{
+                    width: '6px', height: '6px', borderRadius: '50%',
+                    background: theme.activeText, marginLeft: '2px', opacity: 0.7,
+                    animation: 'pulse 2s ease-in-out infinite'
+                  }} />
+                )}
+              </button>
             );
           })}
         </div>
