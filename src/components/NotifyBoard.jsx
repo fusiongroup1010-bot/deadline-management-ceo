@@ -241,101 +241,121 @@ const NotifyBoard = () => {
                                  const readCount = readUsers.length;
                                  const isSenderOrAdmin = n.senderId === currentUser.id || currentUser.id === 'CEOFS';
                                  const isExpanded = expandedReceiptId === n.id;
+                                 const allRead = readCount === total && total > 0;
 
                                  return (
                                    <div>
+                                     {/* Badge button */}
                                      <button
                                        onClick={(e) => {
                                          e.stopPropagation();
-                                         setExpandedReceiptId(isExpanded ? null : n.id);
+                                         if (isSenderOrAdmin) setExpandedReceiptId(isExpanded ? null : n.id);
                                        }}
                                        style={{
                                          display: 'flex', alignItems: 'center', gap: '6px',
                                          fontSize: '12px', fontWeight: '700',
-                                         color: readCount === total ? '#16a34a' : 'var(--text-muted)',
-                                         background: readCount === total ? '#dcfce7' : 'var(--bg-panel-hover)',
-                                         padding: '5px 10px', borderRadius: '20px',
-                                         border: `1px solid ${readCount === total ? '#86efac' : 'var(--border-light)'}`,
+                                         color: allRead ? '#16a34a' : unreadUsers.length > 0 ? '#d97706' : 'var(--text-muted)',
+                                         background: allRead ? '#dcfce7' : unreadUsers.length > 0 ? '#fef3c7' : 'var(--bg-panel-hover)',
+                                         padding: '5px 12px', borderRadius: '20px',
+                                         border: `1.5px solid ${allRead ? '#86efac' : unreadUsers.length > 0 ? '#fcd34d' : 'var(--border-light)'}`,
                                          cursor: isSenderOrAdmin ? 'pointer' : 'default',
-                                         transition: 'all 0.2s'
+                                         transition: 'all 0.2s',
+                                         userSelect: 'none',
                                        }}
                                      >
                                        <Eye size={13} />
-                                       <span>{readCount}/{total} đã đọc</span>
+                                       <span>{readCount}/{total} read</span>
                                        {isSenderOrAdmin && (
                                          isExpanded ? <ChevronUp size={12}/> : <ChevronDown size={12}/>
                                        )}
                                      </button>
 
-                                     {/* Expanded Read Receipt Panel */}
+                                     {/* Expanded Receipt Dropdown */}
                                      {isExpanded && isSenderOrAdmin && (
                                        <div
                                          onClick={e => e.stopPropagation()}
                                          style={{
-                                           position: 'absolute', bottom: 'calc(100% + 8px)', right: 0,
-                                           width: '280px', background: 'var(--bg-panel)',
-                                           borderRadius: '16px', padding: '16px',
-                                           boxShadow: '0 12px 40px rgba(0,0,0,0.12)',
+                                           position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+                                           width: '260px',
+                                           background: 'var(--bg-panel)',
+                                           borderRadius: '16px',
+                                           boxShadow: '0 16px 48px rgba(0,0,0,0.14)',
                                            border: '1px solid var(--border-light)',
-                                           zIndex: 100,
-                                           animation: 'popIn 0.2s cubic-bezier(0.16,1,0.3,1)'
+                                           zIndex: 200,
+                                           animation: 'popIn 0.2s cubic-bezier(0.16,1,0.3,1)',
+                                           overflow: 'hidden',
                                          }}
                                        >
-                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                                           <p style={{ margin: 0, fontSize: '13px', fontWeight: '800', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                             <Users size={15}/> Read Receipts
-                                           </p>
-                                           <button onClick={() => setExpandedReceiptId(null)} style={{ color: 'var(--text-muted)', padding: '2px' }}>
+                                         {/* Header */}
+                                         <div style={{
+                                           padding: '12px 16px',
+                                           borderBottom: '1px solid var(--border-light)',
+                                           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                           background: 'var(--bg-panel)',
+                                           position: 'sticky', top: 0, zIndex: 1,
+                                         }}>
+                                           <span style={{ fontSize: '13px', fontWeight: '800', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '7px' }}>
+                                             <Users size={14} /> Read Receipts
+                                           </span>
+                                           <button onClick={() => setExpandedReceiptId(null)} style={{ color: 'var(--text-muted)', lineHeight: 1 }}>
                                              <X size={14}/>
                                            </button>
                                          </div>
 
-                                         {/* Đã đọc */}
-                                         {readUsers.length > 0 && (
-                                           <div style={{ marginBottom: '12px' }}>
-                                             <p style={{ margin: '0 0 6px', fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', color: '#16a34a', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                               <CheckCircle size={12}/> Đã đọc ({readUsers.length})
-                                             </p>
-                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                         {/* Scrollable Read List */}
+                                         {readUsers.length > 0 ? (
+                                           <>
+                                             <div style={{ padding: '8px 12px 4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                               <CheckCircle size={12} color="#16a34a"/>
+                                               <span style={{ fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', color: '#16a34a', letterSpacing: '0.5px' }}>
+                                                 Read · {readUsers.length}
+                                               </span>
+                                             </div>
+                                             <div style={{
+                                               maxHeight: '220px',
+                                               overflowY: 'auto',
+                                               padding: '4px 12px 8px',
+                                               display: 'flex', flexDirection: 'column', gap: '4px',
+                                             }}>
                                                {readUsers.map(u => (
-                                                 <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '5px 8px', borderRadius: '8px', background: '#f0fdf4' }}>
-                                                   <div style={{ width: '26px', height: '26px', borderRadius: '8px', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: '800', color: '#16a34a' }}>
-                                                     {u.name.charAt(0)}
+                                                 <div key={u.id} style={{
+                                                   display: 'flex', alignItems: 'center', gap: '10px',
+                                                   padding: '7px 10px', borderRadius: '10px',
+                                                   background: '#f0fdf4',
+                                                 }}>
+                                                   <div style={{
+                                                     width: '30px', height: '30px', borderRadius: '9px', flexShrink: 0,
+                                                     background: '#dcfce7', display: 'flex', alignItems: 'center',
+                                                     justifyContent: 'center', fontSize: '12px', fontWeight: '800', color: '#15803d'
+                                                   }}>
+                                                     {u.name.charAt(0).toUpperCase()}
                                                    </div>
-                                                   <div>
-                                                     <p style={{ margin: 0, fontSize: '12px', fontWeight: '700', color: 'var(--text-primary)' }}>{u.name}</p>
+                                                   <div style={{ minWidth: 0 }}>
+                                                     <p style={{ margin: 0, fontSize: '12px', fontWeight: '700', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{u.name}</p>
                                                      <p style={{ margin: 0, fontSize: '10px', color: 'var(--text-muted)' }}>{u.title}</p>
                                                    </div>
+                                                   <CheckCircle size={13} color="#16a34a" style={{ marginLeft: 'auto', flexShrink: 0 }}/>
                                                  </div>
                                                ))}
                                              </div>
-                                           </div>
+                                           </>
+                                         ) : (
+                                           <p style={{ margin: 0, padding: '14px 16px', fontSize: '13px', color: 'var(--text-muted)', textAlign: 'center' }}>No one has read this yet</p>
                                          )}
 
-                                         {/* Chưa đọc */}
+                                         {/* Footer: Not yet read count */}
                                          {unreadUsers.length > 0 && (
-                                           <div>
-                                             <p style={{ margin: '0 0 6px', fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', color: '#ef4444', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                               <EyeOff size={12}/> Chưa đọc ({unreadUsers.length})
-                                             </p>
-                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                               {unreadUsers.map(u => (
-                                                 <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '5px 8px', borderRadius: '8px', background: '#fff1f2' }}>
-                                                   <div style={{ width: '26px', height: '26px', borderRadius: '8px', background: '#fecdd3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: '800', color: '#ef4444' }}>
-                                                     {u.name.charAt(0)}
-                                                   </div>
-                                                   <div>
-                                                     <p style={{ margin: 0, fontSize: '12px', fontWeight: '700', color: 'var(--text-primary)' }}>{u.name}</p>
-                                                     <p style={{ margin: 0, fontSize: '10px', color: 'var(--text-muted)' }}>{u.title}</p>
-                                                   </div>
-                                                 </div>
-                                               ))}
-                                             </div>
+                                           <div style={{
+                                             padding: '9px 16px',
+                                             borderTop: '1px solid var(--border-light)',
+                                             background: '#fff7ed',
+                                             display: 'flex', alignItems: 'center', gap: '7px',
+                                           }}>
+                                             <EyeOff size={13} color="#d97706"/>
+                                             <span style={{ fontSize: '12px', fontWeight: '700', color: '#d97706' }}>
+                                               {unreadUsers.length} not yet read
+                                             </span>
                                            </div>
-                                         )}
-
-                                         {total === 0 && (
-                                           <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-muted)', textAlign: 'center', padding: '8px 0' }}>No recipient data</p>
                                          )}
                                        </div>
                                      )}
@@ -343,6 +363,7 @@ const NotifyBoard = () => {
                                  );
                                })()}
                              </div>
+
                           </div>
                         </div>
                       </div>
