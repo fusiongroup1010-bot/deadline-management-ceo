@@ -151,6 +151,7 @@ const TaskModal = () => {
               <select value={form.location} onChange={e => set('location', e.target.value)} style={selectStyle}>
                 <option value="hanoi">Hanoi</option>
                 <option value="hcm">HCM</option>
+                <option value="hungyen">Hung Yen</option>
               </select>
             </div>
             <div className="form-group">
