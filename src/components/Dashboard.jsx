@@ -108,7 +108,7 @@ const Dashboard = () => {
             {greet.text}, {userName}!
           </h1>
           {/* Brand Showcase - replaces Current Sheet label */}
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '22px', marginBottom: '14px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '22px', marginBottom: '32px', flexWrap: 'wrap' }}>
             {/* SAY ALo */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
               <span style={{ fontSize: '9px', fontWeight: '700', color: greet.iconColor, letterSpacing: '1.5px', textTransform: 'uppercase', opacity: 0.55, marginBottom: '2px' }}>SAY</span>
@@ -149,8 +149,16 @@ const Dashboard = () => {
               </span>
             </div>
           </div>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '600', marginTop: '0' }}>
-            Week: {format(startOfWk, 'dd MMM')} - {format(endOfWk, 'dd MMM')} · {dueToday.length > 0 ? `${dueToday.length} item${dueToday.length>1?'s':''} due today` : 'No tasks due today'}{overdue.length > 0 ? ` · ${overdue.length} overdue` : ''}
+          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '600', marginTop: '0', display: 'flex', alignItems: 'center' }}>
+            <span>Week: {format(startOfWk, 'dd/MM')} - {format(endOfWk, 'dd/MM')}</span>
+            <span style={{ margin: '0 12px' }}>·</span>
+            <span>{dueToday.length > 0 ? `${dueToday.length} item${dueToday.length>1?'s':''} due today` : 'No tasks due today'}</span>
+            {overdue.length > 0 && (
+              <>
+                <span style={{ margin: '0 32px' }}>·</span>
+                <span>{overdue.length} overdue</span>
+              </>
+            )}
           </p>
         </div>
         <div style={{ width: '120px', height: '120px', background: 'rgba(255,255,255,0.5)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '10px', backdropFilter: 'blur(4px)' }}>
