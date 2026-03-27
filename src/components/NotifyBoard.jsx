@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Megaphone, Search, Pin, Trash2, CheckCircle, Clock, AlertCircle, Filter, Trash, Search as SearchIcon, X } from 'lucide-react';
+import { Megaphone, Search, Pin, Trash2, CheckCircle, Clock, AlertCircle, Filter, Trash, Search as SearchIcon, X, Eye, EyeOff, Users, ChevronDown, ChevronUp } from 'lucide-react';
 import { useNotify } from '../context/NotifyContext';
 import { useAuth } from '../context/AuthContext';
 import { format } from 'date-fns';
@@ -7,9 +7,10 @@ import { enUS } from 'date-fns/locale';
 
 const NotifyBoard = () => {
   const { currentUser } = useAuth();
-  const { notifications, markAsRead, togglePin, deleteNotification, sendNotification } = useNotify();
+  const { notifications, markAsRead, togglePin, deleteNotification, sendNotification, getReadReceipts } = useNotify();
   const [activeTab, setActiveTab] = useState('all'); // all, unread, pinned
   const [search, setSearch] = useState('');
+  const [expandedReceiptId, setExpandedReceiptId] = useState(null); // which notif receipt is open
   
   // Compose State
   const [showCompose, setShowCompose] = useState(false);
@@ -211,7 +212,8 @@ const NotifyBoard = () => {
                         <div style={{ paddingLeft: '56px' }}>
                           <p style={{ fontSize: '15px', lineHeight: '1.6', color: 'var(--text-primary)', fontWeight: '500', whiteSpace: 'pre-wrap' }}>{n.content}</p>
                           
-                          <div style={{ marginTop: '16px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                          {/* Bottom row: actions + read receipts */}
+                          <div style={{ marginTop: '16px', display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
                              {currentUser.canSendNotify && (
                                <button 
                                  className="btn-ghost-mini" 
@@ -230,7 +232,117 @@ const NotifyBoard = () => {
                                  <Trash size={14} /> Delete
                                </button>
                              )}
-                             {!isUnread && <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '700', marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '4px' }}><CheckCircle size={14} /> Read</span>}
+
+                             {/* Read Receipts - aligned right */}
+                             <div style={{ marginLeft: 'auto', position: 'relative' }}>
+                               {(() => {
+                                 const { readUsers, unreadUsers } = getReadReceipts(n);
+                                 const total = readUsers.length + unreadUsers.length;
+                                 const readCount = readUsers.length;
+                                 const isSenderOrAdmin = n.senderId === currentUser.id || currentUser.id === 'CEOFS';
+                                 const isExpanded = expandedReceiptId === n.id;
+
+                                 return (
+                                   <div>
+                                     <button
+                                       onClick={(e) => {
+                                         e.stopPropagation();
+                                         setExpandedReceiptId(isExpanded ? null : n.id);
+                                       }}
+                                       style={{
+                                         display: 'flex', alignItems: 'center', gap: '6px',
+                                         fontSize: '12px', fontWeight: '700',
+                                         color: readCount === total ? '#16a34a' : 'var(--text-muted)',
+                                         background: readCount === total ? '#dcfce7' : 'var(--bg-panel-hover)',
+                                         padding: '5px 10px', borderRadius: '20px',
+                                         border: `1px solid ${readCount === total ? '#86efac' : 'var(--border-light)'}`,
+                                         cursor: isSenderOrAdmin ? 'pointer' : 'default',
+                                         transition: 'all 0.2s'
+                                       }}
+                                     >
+                                       <Eye size={13} />
+                                       <span>{readCount}/{total} đã đọc</span>
+                                       {isSenderOrAdmin && (
+                                         isExpanded ? <ChevronUp size={12}/> : <ChevronDown size={12}/>
+                                       )}
+                                     </button>
+
+                                     {/* Expanded Read Receipt Panel */}
+                                     {isExpanded && isSenderOrAdmin && (
+                                       <div
+                                         onClick={e => e.stopPropagation()}
+                                         style={{
+                                           position: 'absolute', bottom: 'calc(100% + 8px)', right: 0,
+                                           width: '280px', background: 'var(--bg-panel)',
+                                           borderRadius: '16px', padding: '16px',
+                                           boxShadow: '0 12px 40px rgba(0,0,0,0.12)',
+                                           border: '1px solid var(--border-light)',
+                                           zIndex: 100,
+                                           animation: 'popIn 0.2s cubic-bezier(0.16,1,0.3,1)'
+                                         }}
+                                       >
+                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                           <p style={{ margin: 0, fontSize: '13px', fontWeight: '800', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                             <Users size={15}/> Read Receipts
+                                           </p>
+                                           <button onClick={() => setExpandedReceiptId(null)} style={{ color: 'var(--text-muted)', padding: '2px' }}>
+                                             <X size={14}/>
+                                           </button>
+                                         </div>
+
+                                         {/* Đã đọc */}
+                                         {readUsers.length > 0 && (
+                                           <div style={{ marginBottom: '12px' }}>
+                                             <p style={{ margin: '0 0 6px', fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', color: '#16a34a', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                               <CheckCircle size={12}/> Đã đọc ({readUsers.length})
+                                             </p>
+                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                               {readUsers.map(u => (
+                                                 <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '5px 8px', borderRadius: '8px', background: '#f0fdf4' }}>
+                                                   <div style={{ width: '26px', height: '26px', borderRadius: '8px', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: '800', color: '#16a34a' }}>
+                                                     {u.name.charAt(0)}
+                                                   </div>
+                                                   <div>
+                                                     <p style={{ margin: 0, fontSize: '12px', fontWeight: '700', color: 'var(--text-primary)' }}>{u.name}</p>
+                                                     <p style={{ margin: 0, fontSize: '10px', color: 'var(--text-muted)' }}>{u.title}</p>
+                                                   </div>
+                                                 </div>
+                                               ))}
+                                             </div>
+                                           </div>
+                                         )}
+
+                                         {/* Chưa đọc */}
+                                         {unreadUsers.length > 0 && (
+                                           <div>
+                                             <p style={{ margin: '0 0 6px', fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', color: '#ef4444', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                               <EyeOff size={12}/> Chưa đọc ({unreadUsers.length})
+                                             </p>
+                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                               {unreadUsers.map(u => (
+                                                 <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '5px 8px', borderRadius: '8px', background: '#fff1f2' }}>
+                                                   <div style={{ width: '26px', height: '26px', borderRadius: '8px', background: '#fecdd3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: '800', color: '#ef4444' }}>
+                                                     {u.name.charAt(0)}
+                                                   </div>
+                                                   <div>
+                                                     <p style={{ margin: 0, fontSize: '12px', fontWeight: '700', color: 'var(--text-primary)' }}>{u.name}</p>
+                                                     <p style={{ margin: 0, fontSize: '10px', color: 'var(--text-muted)' }}>{u.title}</p>
+                                                   </div>
+                                                 </div>
+                                               ))}
+                                             </div>
+                                           </div>
+                                         )}
+
+                                         {total === 0 && (
+                                           <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-muted)', textAlign: 'center', padding: '8px 0' }}>No recipient data</p>
+                                         )}
+                                       </div>
+                                     )}
+                                   </div>
+                                 );
+                               })()}
+                             </div>
                           </div>
                         </div>
                       </div>

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { collection, query, orderBy, onSnapshot, addDoc, updateDoc, doc, deleteDoc, serverTimestamp, where, arrayUnion } from 'firebase/firestore';
 import { useAuth } from './AuthContext';
+import { EMPLOYEES } from './AuthContext';
 
 const NotifyContext = createContext();
 
@@ -81,6 +82,39 @@ export const NotifyProvider = ({ children }) => {
     await deleteDoc(doc(db, 'notifications_ceo', id));
   };
 
+  /**
+   * Given a notification, compute who has read and who hasn't.
+   * Recipients are expanded to the actual user list.
+   * Only visible to the sender or admins.
+   */
+  const getReadReceipts = (notif) => {
+    if (!notif) return { readUsers: [], unreadUsers: [] };
+
+    // Expand recipients to actual employee IDs
+    const recipientIds = EMPLOYEES
+      .filter(emp => {
+        if (notif.recipients.includes('all')) return emp.id !== 'Guest';
+        if (notif.recipients.includes(emp.id)) return true;
+        // location-based
+        return notif.recipients.some(r => emp.allowedLocations?.includes(r));
+      })
+      .map(emp => emp.id);
+
+    const readSet = new Set(notif.readBy || []);
+
+    const readUsers = recipientIds
+      .filter(id => readSet.has(id))
+      .map(id => EMPLOYEES.find(e => e.id === id))
+      .filter(Boolean);
+
+    const unreadUsers = recipientIds
+      .filter(id => !readSet.has(id))
+      .map(id => EMPLOYEES.find(e => e.id === id))
+      .filter(Boolean);
+
+    return { readUsers, unreadUsers };
+  };
+
   const value = {
     notifications,
     unreadCount,
@@ -88,6 +122,7 @@ export const NotifyProvider = ({ children }) => {
     markAsRead,
     togglePin,
     deleteNotification,
+    getReadReceipts,
     loading
   };
 
