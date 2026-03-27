@@ -108,20 +108,20 @@ const Dashboard = () => {
             {greet.text}, {userName}!
           </h1>
           {/* Brand Showcase - replaces Current Sheet label */}
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '22px', marginBottom: '32px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '30px', marginBottom: '32px', flexWrap: 'wrap' }}>
             {/* SAY ALo */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
-              <span style={{ fontSize: '9px', fontWeight: '700', color: greet.iconColor, letterSpacing: '1.5px', textTransform: 'uppercase', opacity: 0.55, marginBottom: '2px' }}>SAY</span>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1, position: 'relative', paddingLeft: '24px', paddingTop: '4px' }}>
+              <span style={{ position: 'absolute', top: '-4px', left: 0, fontSize: '9px', fontWeight: '700', color: greet.iconColor, letterSpacing: '1.5px', textTransform: 'uppercase', opacity: 0.55 }}>SAY</span>
               <span style={{ fontSize: '20px', fontWeight: '900', color: '#cc1515', fontFamily: 'Georgia, serif', letterSpacing: '-0.5px', lineHeight: 1 }}>
-                AL<span style={{ fontSize: '23px', fontStyle: 'italic' }}>o</span>
+                AL<span style={{ fontStyle: 'italic' }}>O</span>
                 <span style={{ fontSize: '8px', fontWeight: '700', color: '#cc1515', verticalAlign: 'super', marginLeft: '1px' }}>®</span>
               </span>
               <span style={{ fontSize: '8px', fontWeight: '700', color: '#cc1515', letterSpacing: '0.4px', fontStyle: 'italic', marginTop: '3px', opacity: 0.85 }}>Taste the difference</span>
             </div>
 
             {/* HOW Today's */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
-              <span style={{ fontSize: '9px', fontWeight: '700', color: greet.iconColor, letterSpacing: '1.5px', textTransform: 'uppercase', opacity: 0.55, marginBottom: '2px' }}>HOW</span>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1, position: 'relative', paddingLeft: '24px', paddingTop: '4px' }}>
+              <span style={{ position: 'absolute', top: '-4px', left: 0, fontSize: '9px', fontWeight: '700', color: greet.iconColor, letterSpacing: '1.5px', textTransform: 'uppercase', opacity: 0.55 }}>HOW</span>
               <span style={{ fontSize: '20px', fontWeight: '800', color: '#d4880a', fontFamily: 'Georgia, serif', letterSpacing: '-0.5px', lineHeight: 1 }}>
                 Today<span style={{ color: '#d4880a' }}>'</span>s
                 <span style={{ fontSize: '8px', fontWeight: '700', color: '#d4880a', verticalAlign: 'super', marginLeft: '1px' }}>®</span>
@@ -130,8 +130,8 @@ const Dashboard = () => {
             </div>
 
             {/* FEEL FINE */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
-              <span style={{ fontSize: '9px', fontWeight: '700', color: greet.iconColor, letterSpacing: '1.5px', textTransform: 'uppercase', opacity: 0.55, marginBottom: '2px' }}>FEEL</span>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1, position: 'relative', paddingLeft: '24px', paddingTop: '4px' }}>
+              <span style={{ position: 'absolute', top: '-4px', left: 0, fontSize: '9px', fontWeight: '700', color: greet.iconColor, letterSpacing: '1.5px', textTransform: 'uppercase', opacity: 0.55 }}>FEEL</span>
               <span style={{ fontSize: '20px', fontWeight: '900', color: '#2e7d32', fontFamily: 'Impact, Arial Black, sans-serif', letterSpacing: '1px', lineHeight: 1 }}>
                 FINE
                 <span style={{ fontSize: '8px', fontWeight: '700', color: '#2e7d32', verticalAlign: 'super', marginLeft: '1px' }}>®</span>
@@ -139,12 +139,15 @@ const Dashboard = () => {
               <span style={{ fontSize: '8px', fontWeight: '700', color: '#2e7d32', letterSpacing: '0.4px', fontStyle: 'italic', marginTop: '3px', opacity: 0.85 }}>From Nature</span>
             </div>
 
-            {/* AND Merci — "Pure taste" sits ABOVE the brand name */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
-              <span style={{ fontSize: '9px', fontWeight: '700', color: greet.iconColor, letterSpacing: '1.5px', textTransform: 'uppercase', opacity: 0.55, marginBottom: '1px' }}>AND</span>
-              <span style={{ fontSize: '8px', fontWeight: '700', color: '#e07b18', letterSpacing: '1px', textTransform: 'uppercase', opacity: 0.85, marginBottom: '2px' }}>Pure taste</span>
-              <span style={{ fontSize: '20px', fontWeight: '800', color: '#e07b18', fontFamily: 'Georgia, serif', letterSpacing: '0.5px', lineHeight: 1 }}>
-                Merci
+            {/* AND Merci — PURE TASTE over 'erci' */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1, position: 'relative', paddingLeft: '24px', paddingTop: '4px' }}>
+              <span style={{ position: 'absolute', top: '-4px', left: 0, fontSize: '9px', fontWeight: '700', color: greet.iconColor, letterSpacing: '1.5px', textTransform: 'uppercase', opacity: 0.55 }}>AND</span>
+              <span style={{ fontSize: '20px', fontWeight: '800', color: '#e07b18', fontFamily: 'Georgia, serif', letterSpacing: '0.5px', lineHeight: 1, marginTop: '5px' }}>
+                M
+                <span style={{ position: 'relative' }}>
+                  <span style={{ position: 'absolute', bottom: '100%', left: 0, fontSize: '6px', fontWeight: '700', color: '#e07b18', letterSpacing: '1px', textTransform: 'uppercase', whiteSpace: 'nowrap', marginBottom: '2px', opacity: 0.85 }}>PURE TASTE</span>
+                  erci
+                </span>
                 <span style={{ fontSize: '8px', fontWeight: '700', color: '#e07b18', verticalAlign: 'super', marginLeft: '1px' }}>®</span>
               </span>
             </div>
