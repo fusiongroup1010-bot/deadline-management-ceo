@@ -34,50 +34,21 @@ const Dashboard = () => {
   const { currentUser } = useAuth();
   const tday = today();
 
+  // Location-aware banner config
+  const LOCATION_BANNER = {
+    hanoi:   { bannerBg: 'linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%)', textColor: '#1e3a8a' },
+    hcm:     { bannerBg: 'linear-gradient(135deg, #fff0f7 0%, #fce7f3 100%)', textColor: '#831843' },
+    hungyen: { bannerBg: 'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)', textColor: '#4c1d95' },
+  };
+  const locBanner = LOCATION_BANNER[activeLocation] || LOCATION_BANNER.hanoi;
+
   const getGreeting = () => {
     const hour = new Date().getHours();
-    // Use theme colors directly from variables if possible, but hardcoded here to ensure they match exactly
-    const blueThemeBg = 'linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%)';
-    const mainTextColor = '#1e3a8a';
-    
-    if (hour >= 6 && hour < 12) {
-      return { 
-        text: 'Good morning', 
-        icon: Sun, 
-        bg: blueThemeBg, 
-        iconColor: mainTextColor, 
-        accent: '#f59e0b', // Yellow
-        animate: 'sun-rotate'
-      };
-    }
-    if (hour >= 12 && hour < 18) {
-      return { 
-        text: 'Good afternoon', 
-        icon: Sunset, 
-        bg: blueThemeBg, 
-        iconColor: mainTextColor, 
-        accent: '#f97316', // Orange
-        animate: 'sunset-float'
-      };
-    }
-    if (hour >= 18 && hour < 23) {
-      return { 
-        text: 'Good evening', 
-        icon: Moon, 
-        bg: 'linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)', 
-        iconColor: mainTextColor, 
-        accent: '#fcd34d',
-        animate: 'sunset-float'
-      };
-    }
-    return { 
-      text: 'Good night', 
-      icon: Sparkles, 
-      bg: 'linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%)', 
-      iconColor: mainTextColor, 
-      accent: '#fcd34d',
-      animate: 'sunset-float'
-    };
+    const { bannerBg, textColor } = locBanner;
+    if (hour >= 6 && hour < 12)  return { text: 'Good morning',  icon: Sun,      bannerBg, iconColor: textColor, accent: '#f59e0b', animate: 'sun-rotate'   };
+    if (hour >= 12 && hour < 18) return { text: 'Good afternoon', icon: Sunset,   bannerBg, iconColor: textColor, accent: '#f97316', animate: 'sunset-float' };
+    if (hour >= 18 && hour < 23) return { text: 'Good evening',   icon: Moon,     bannerBg, iconColor: textColor, accent: '#fcd34d', animate: 'sunset-float' };
+    return                              { text: 'Good night',     icon: Sparkles, bannerBg, iconColor: textColor, accent: '#fcd34d', animate: 'sunset-float' };
   };
 
   const greet = getGreeting();
@@ -127,7 +98,7 @@ const Dashboard = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
       {/* Greeting banner */}
       <div className="soft-panel animate-fade-in" style={{
-        background: greet.bg,
+        background: greet.bannerBg,
         padding: '32px', borderRadius: 'var(--radius-lg)',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         border: 'none', boxShadow: '0 12px 30px rgba(0,0,0,0.05)'

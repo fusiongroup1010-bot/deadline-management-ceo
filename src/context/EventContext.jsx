@@ -69,22 +69,69 @@ export const EventProvider = ({ children }) => {
     }
   }, [currentUser]);
 
-  // Change app background color when activeLocation changes
+  // Change full app theme when activeLocation changes
   useEffect(() => {
-    const BG_MAP = {
-      hanoi:   { bg: '#eef6ff', panel: '#f8fbff', border: 'rgba(59,130,246,0.08)' },
-      hcm:     { bg: '#fff0f7', panel: '#fff8fd', border: 'rgba(236,72,153,0.08)' },
-      hungyen: { bg: '#f5f3ff', panel: '#faf9ff', border: 'rgba(139,92,246,0.08)' },
+    const THEME_MAP = {
+      hanoi: {
+        bg:             '#eef6ff',
+        panelHover:     '#f0f8ff',
+        border:         'rgba(59,130,246,0.09)',
+        accent:         '#3b82f6',
+        pastel:         '#dbeafe',
+        pastelHover:    '#bfdbfe',
+        textSecondary:  '#3b82f6',
+        textPrimary:    '#1e3a8a',
+        shadowSoft:     '0 10px 30px rgba(59,130,246,0.05)',
+        shadowHover:    '0 15px 40px rgba(59,130,246,0.12)',
+        bannerBg:       'linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%)',
+      },
+      hcm: {
+        bg:             '#fff0f7',
+        panelHover:     '#fff5fa',
+        border:         'rgba(236,72,153,0.09)',
+        accent:         '#ec4899',
+        pastel:         '#fce7f3',
+        pastelHover:    '#fbcfe8',
+        textSecondary:  '#db2777',
+        textPrimary:    '#831843',
+        shadowSoft:     '0 10px 30px rgba(236,72,153,0.05)',
+        shadowHover:    '0 15px 40px rgba(236,72,153,0.12)',
+        bannerBg:       'linear-gradient(135deg, #fff0f7 0%, #fce7f3 100%)',
+      },
+      hungyen: {
+        bg:             '#f5f3ff',
+        panelHover:     '#f9f7ff',
+        border:         'rgba(139,92,246,0.09)',
+        accent:         '#8b5cf6',
+        pastel:         '#ede9fe',
+        pastelHover:    '#ddd6fe',
+        textSecondary:  '#7c3aed',
+        textPrimary:    '#4c1d95',
+        shadowSoft:     '0 10px 30px rgba(139,92,246,0.05)',
+        shadowHover:    '0 15px 40px rgba(139,92,246,0.12)',
+        bannerBg:       'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)',
+      },
     };
-    const theme = BG_MAP[activeLocation] || BG_MAP.hanoi;
+    const t = THEME_MAP[activeLocation] || THEME_MAP.hanoi;
     const root = document.documentElement;
-    // Only override if user hasn't manually set a custom bg
     const userBg = localStorage.getItem('bgColor');
+    const userTheme = localStorage.getItem('themeColor');
     if (!userBg) {
-      root.style.setProperty('--bg-main', theme.bg);
-      root.style.setProperty('--bg-panel-hover', theme.panel);
-      root.style.setProperty('--border-light', theme.border);
+      root.style.setProperty('--bg-main', t.bg);
+      root.style.setProperty('--bg-panel-hover', t.panelHover);
+      root.style.setProperty('--border-light', t.border);
     }
+    if (!userTheme) {
+      root.style.setProperty('--primary-accent', t.accent);
+      root.style.setProperty('--primary-pastel', t.pastel);
+      root.style.setProperty('--primary-pastel-hover', t.pastelHover);
+      root.style.setProperty('--text-secondary', t.textSecondary);
+      root.style.setProperty('--text-primary', t.textPrimary);
+      root.style.setProperty('--shadow-soft', t.shadowSoft);
+      root.style.setProperty('--shadow-hover', t.shadowHover);
+    }
+    // Store banner bg for Dashboard to read
+    root.style.setProperty('--location-banner-bg', t.bannerBg);
   }, [activeLocation]);
 
   // Sync with Firestore
