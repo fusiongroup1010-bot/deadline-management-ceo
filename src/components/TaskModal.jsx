@@ -149,9 +149,9 @@ const TaskModal = () => {
             <div className="form-group">
               <label style={labelStyle}><MapPin size={11} style={{ display: 'inline', marginRight: 4 }} />Location</label>
               <select value={form.location} onChange={e => set('location', e.target.value)} style={selectStyle}>
-                <option value="hanoi">Hanoi</option>
-                <option value="hcm">HCM</option>
-                <option value="hungyen">Hung Yen</option>
+                {['hanoi', 'hcm', 'hungyen'].filter(loc => currentUser?.editableLocations?.includes(loc)).map(loc => (
+                  <option key={loc} value={loc}>{loc === 'hanoi' ? 'Hanoi' : loc === 'hcm' ? 'HCM' : 'Hung Yen'}</option>
+                ))}
               </select>
             </div>
             <div className="form-group">
