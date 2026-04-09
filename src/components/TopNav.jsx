@@ -100,7 +100,7 @@ const TopNav = ({ onMenuClick }) => {
            <span>{format(today, 'EEEE, MMM dd', { locale: enUS })}</span>
         </div>
 
-        {currentUser?.role !== 'guest' && (
+        {currentUser?.role !== 'guest' && currentUser?.editableLocations?.includes(activeLocation) && (
           <button 
             className="btn-primary" 
             style={{ display: 'flex', alignItems: 'center', gap: '8px' }}

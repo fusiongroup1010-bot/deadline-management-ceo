@@ -408,6 +408,96 @@ button {
   position: relative; /* Base for sticky children */
 }
 
+.calendar-summary-panel {
+  width: 240px;
+  min-width: 200px;
+  background: var(--bg-panel);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.calendar-summary-panel.collapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.summary-sidebar-toggle {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border-light);
+  background: white;
+  color: var(--text-primary);
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  box-shadow: var(--shadow-soft);
+}
+
+.summary-sidebar-toggle:hover {
+  background: var(--bg-panel-hover);
+  transform: scale(1.1);
+}
+
+.summary-dept-card {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--bg-panel-hover);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.summary-dept-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+}
+
+.summary-dept-card.active {
+  border-color: var(--primary-accent);
+  background: var(--bg-panel);
+}
+
+.summary-task-item {
+  padding: 8px 10px;
+  margin: 4px 0;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.summary-task-item:hover {
+  background: var(--primary-pastel);
+  color: var(--primary-accent);
+  border-color: var(--primary-accent);
+}
+
+@keyframes highlight-flash {
+  0% { outline: 3px solid var(--primary-accent); outline-offset: 2px; }
+  100% { outline: 0px solid transparent; outline-offset: 0px; }
+}
+
+.highlight-event {
+  animation: highlight-flash 1.5s ease-out;
+}
+
 .calendar-header {
   display: grid;
   grid-template-columns: 80px repeat(7, 1fr);

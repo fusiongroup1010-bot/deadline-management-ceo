@@ -24,6 +24,7 @@ export const EMPLOYEES = [
   { id: 'HCMMKT', name: 'HCM MKT', role: 'admin', pass: 'HCM6211#', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hcm'], canSendNotify: false, title: 'MKT' },
   { id: 'HCMHR', name: 'HCM HR', role: 'admin', pass: 'HCMHR111!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hcm'], canSendNotify: false, title: 'HR' },
   { id: 'HCMTra', name: 'HCM Tra', role: 'admin', pass: 'Tra112!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hcm'], canSendNotify: false, title: 'Staff' },
+  { id: 'HCMSales', name: 'HCM Sales', role: 'admin', pass: 'HCMS222@', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hcm'], canSendNotify: false, title: 'Sales' },
   
   // Hung Yen Authorized Staff - View All, Edit Hung Yen
   { id: 'MunFD', name: 'Mun FD', role: 'admin', pass: 'MunFS123', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'], canSendNotify: true, notifyScope: 'restricted', title: 'Factory Director' },
@@ -34,6 +35,10 @@ export const EMPLOYEES = [
   { id: 'NiQC', name: 'Ni QC', role: 'admin', pass: 'Ni345@', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'], canSendNotify: false, title: 'QC' },
   { id: 'LinhDs', name: 'Linh Ds', role: 'admin', pass: 'LinhD345!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'], canSendNotify: false, title: 'Designer' },
   { id: 'Evolution', name: 'Evolution', role: 'admin', pass: 'EV123!', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'], canSendNotify: false, title: 'Staff' },
+  { id: 'HongPM', name: 'Hong PM', role: 'admin', pass: 'Hong345@', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'], canSendNotify: false, title: 'PM' },
+  { id: 'LanPP', name: 'Lan PP', role: 'admin', pass: 'Lan123$', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'], canSendNotify: false, title: 'PP' },
+  { id: 'LienLOG', name: 'Lien LOG', role: 'admin', pass: 'Lien789@', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'], canSendNotify: false, title: 'LOG' },
+  { id: 'LienLOGHY', name: 'Lien LOG HY', role: 'admin', pass: 'Lien789@', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: ['hungyen'], canSendNotify: false, title: 'LOG' },
 
   // Guest Mode
   { id: 'Guest', name: 'Guest Mode', role: 'guest', allowedLocations: ['hanoi', 'hcm', 'hungyen'], editableLocations: [], canSendNotify: false, title: 'Guest' }

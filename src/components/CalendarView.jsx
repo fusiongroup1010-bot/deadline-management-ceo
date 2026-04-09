@@ -35,7 +35,7 @@ const toCalSlot = (item, weekStart) => {
 };
 
 /* ── Event Card with hover ... dropdown ── */
-const EventCard = ({ event, topPos, height, leftPos, width, onEdit, onDelete, onOpen, canEdit }) => {
+const EventCard = ({ event, topPos, height, leftPos, width, onEdit, onDelete, onOpen, canEdit, isFocused, anyFocused }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -49,14 +49,21 @@ const EventCard = ({ event, topPos, height, leftPos, width, onEdit, onDelete, on
 
   return (
     <div
+      id={`event-${event.id}`}
       className="event-card"
       style={{
         top: `${topPos}%`, left: leftPos, width: width,
         height: `calc(${height}% - 2px)`,
         minHeight: '76px',
-        zIndex: 15,
-        background: event.color, color: event.text, borderColor: event.text,
-        position: 'absolute', overflow: 'visible'
+        zIndex: isFocused ? 25 : 15,
+        background: event.color, 
+        color: event.text, 
+        borderColor: event.text,
+        position: 'absolute', overflow: 'visible',
+        opacity: anyFocused && !isFocused ? 0.15 : 1,
+        filter: anyFocused && !isFocused ? 'grayscale(0.5) blur(1px)' : 'none',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        pointerEvents: anyFocused && !isFocused ? 'none' : 'auto'
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => { setIsHovered(false); setMenuOpen(false); }}
@@ -64,7 +71,17 @@ const EventCard = ({ event, topPos, height, leftPos, width, onEdit, onDelete, on
     >
       {/* Title + ... button */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '4px' }}>
-        <div className="event-title" style={{ flex: 1 }}>
+        <div className="event-title" style={{ 
+          flex: 1, 
+          textAlign: event.status === 'in-progress' ? 'right' : 'left',
+          fontSize: '11px',
+          lineHeight: '1.2',
+          maxHeight: '3.6em',
+          overflow: 'hidden',
+          display: '-webkit-box',
+          WebkitLineClamp: 3,
+          WebkitBoxOrient: 'vertical'
+        }}>
           {TYPE_LABEL[event.type] || ''} {event.title}
         </div>
         {canEdit && (
@@ -114,47 +131,61 @@ const EventCard = ({ event, topPos, height, leftPos, width, onEdit, onDelete, on
         )}
       </div>
 
-      {/* Status Badge */}
-      {(() => {
-        let text = '';
-        let bgColor = '';
-        const todayStr = new Date().toISOString().split('T')[0];
-        
-        if (event.status === 'done') {
-          text = 'Done';
-          bgColor = '#7c3aed'; // purple
-        } else if (event.status === 'in-progress') {
-          text = 'In progress';
-          bgColor = '#2563eb'; // blue
-        } else if (event.status === 'todo' && event.dueDate && event.dueDate < todayStr) {
-          text = 'Overdue';
-          bgColor = '#ef4444'; // red
-        }
-
-        if (!text) return null;
-
-        return (
-          <div style={{
-            position: 'absolute',
-            bottom: '4px',
-            right: '4px',
-            backgroundColor: bgColor,
-            color: '#ffffff',
-            fontSize: '10px',
-            fontWeight: '800',
-            padding: '2px 8px',
-            borderRadius: '6px',
-            zIndex: 2,
-          }}>
-            {text}
+      {/* Focus Status Badge & Tracker */}
+      <div style={{ position: 'absolute', bottom: '4px', right: '4px', display: 'flex', alignItems: 'center', gap: '4px', zIndex: 2 }}>
+        {event.status === 'in-progress' && event.updatedBy && (
+          <div style={{ fontSize: '9px', fontWeight: '700', color: 'inherit', opacity: 0.8, whiteSpace: 'nowrap', maxWidth: '60px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {event.updatedBy}
           </div>
-        );
-      })()}
+        )}
+        {(() => {
+          let text = '';
+          let bgColor = '';
+          const todayStr = new Date().toISOString().split('T')[0];
+          
+          if (event.status === 'done') {
+            text = 'Done';
+            bgColor = '#7c3aed';
+          } else if (event.status === 'in-progress') {
+            text = 'In progress';
+            bgColor = '#2563eb';
+          } else if (event.status === 'todo' && event.dueDate && event.dueDate < todayStr) {
+            text = 'Overdue';
+            bgColor = '#ef4444';
+          }
+  
+          if (!text) return null;
+  
+          return (
+            <div style={{
+              backgroundColor: bgColor,
+              color: '#ffffff',
+              fontSize: '9px',
+              fontWeight: '800',
+              padding: '1px 6px',
+              borderRadius: '4px',
+              whiteSpace: 'nowrap',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}>
+              {text}
+            </div>
+          );
+        })()}
+      </div>
 
-      {/* Tracking info */}
-      {event.updatedBy && (
-        <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid rgba(0,0,0,0.1)', fontSize: '9px', fontWeight: '600' }}>
-          Edited by <strong>{event.updatedBy}</strong>
+      {/* Tracking info normally */}
+      {event.updatedBy && event.status !== 'in-progress' && (
+        <div style={{ 
+          marginTop: '4px', 
+          paddingTop: '4px', 
+          borderTop: '1px solid rgba(0,0,0,0.06)', 
+          fontSize: '8px', 
+          fontWeight: '600',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis'
+        }}>
+          By <strong>{event.updatedBy}</strong>
         </div>
       )}
     </div>
@@ -174,6 +205,23 @@ const CalendarView = () => {
   const [activeCategories, setActiveCategories] = useState({});
   const [internalSidebarOpen, setInternalSidebarOpen] = useState(true);
   const [gridZoom, setGridZoom] = useState(240); // Initial day width in px
+  const [expandedDept, setExpandedDept] = useState(null);
+  const [focusedTaskId, setFocusedTaskId] = useState(null);
+  const [summarySidebarOpen, setSummarySidebarOpen] = useState(true);
+
+  const scrollToTask = (id) => {
+    const el = document.getElementById(`event-${id}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+      el.classList.add('highlight-event');
+      setTimeout(() => el.classList.remove('highlight-event'), 2000);
+    }
+  };
+
+  const toggleFocus = (id) => {
+    setFocusedTaskId(prev => prev === id ? null : id);
+    if (focusedTaskId !== id) scrollToTask(id);
+  };
 
   useEffect(() => {
     setActiveCategories(Object.fromEntries(currentDepts.map(c => [c.id, true])));
@@ -187,6 +235,7 @@ const CalendarView = () => {
   };
 
   const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
+  const weekRangeStr = `${format(weekStart, 'dd MMM', { locale: enUS })} - ${format(addDays(weekStart, 6), 'dd MMM', { locale: enUS })}`;
   const days = Array.from({ length: 7 }, (_, i) => {
     const d = addDays(weekStart, i);
     return { name: format(d, 'EEE', { locale: enUS }), date: format(d, 'd'), fullDate: d };
@@ -267,7 +316,20 @@ const CalendarView = () => {
 
           {/* Department filter */}
           <div style={{ marginTop: '12px' }}>
-            <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '12px', color: 'var(--text-primary)' }}>My Calendars</h4>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <h4 style={{ fontSize: '14px', fontWeight: '800', margin: 0, color: 'var(--text-primary)' }}>My Calendars</h4>
+              <button 
+                onClick={() => {
+                  const allSelected = currentDepts.every(c => activeCategories[c.id]);
+                  const nextState = { ...activeCategories };
+                  currentDepts.forEach(c => nextState[c.id] = !allSelected);
+                  setActiveCategories(nextState);
+                }}
+                style={{ fontSize: '11px', fontWeight: '700', color: 'var(--blue-accent)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+              >
+                {currentDepts.length > 0 && currentDepts.every(c => activeCategories[c.id]) ? 'Deselect All' : 'Select All'}
+              </button>
+            </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {currentDepts.map(cat => (
                 <label key={cat.id} className="check-item" style={{
@@ -351,10 +413,84 @@ const CalendarView = () => {
                     onDelete={() => deleteEvent(slot.id)}
                     onOpen={() => openEditModal(slot)}
                     canEdit={canEdit}
+                    isFocused={focusedTaskId === slot.id}
+                    anyFocused={focusedTaskId !== null}
                   />
                 );
               })}
             </div>
+          </div>
+        </div>
+
+        {/* Right Summary Panel */}
+        <div className={`calendar-summary-panel ${!summarySidebarOpen ? 'collapsed' : ''}`}>
+          <button 
+            onClick={() => setSummarySidebarOpen(!summarySidebarOpen)}
+            className="summary-sidebar-toggle"
+            style={{
+              position: 'absolute', right: summarySidebarOpen ? '220px' : '0px', top: '10px',
+              zIndex: 110, background: 'var(--bg-panel)', border: '1px solid var(--border-light)',
+              padding: '5px', borderRadius: '50%', cursor: 'pointer', boxShadow: 'var(--shadow-soft)',
+              transition: 'all 0.3s ease', display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}
+            title={summarySidebarOpen ? "Hide Stats" : "Show Stats"}
+          >
+            {summarySidebarOpen ? <ChevronLeft style={{ transform: 'rotate(180deg)' }} size={16} /> : <Users size={16} />}
+          </button>
+
+          <div style={{ marginBottom: '12px', paddingBottom: '12px', borderBottom: '1px solid var(--border-light)' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: '800', margin: 0, color: 'var(--text-primary)' }}>📊 Weekly Stats</h3>
+            <p style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>{weekRangeStr}</p>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {(() => {
+              let globalIdx = 0;
+              return currentDepts.map(dept => {
+                const deptTasks = calSlots.filter(s => s.categoryId === dept.id);
+                if (deptTasks.length === 0) return null;
+                const isExpanded = expandedDept === dept.id;
+
+                return (
+                  <div key={dept.id} className={`summary-dept-card ${isExpanded ? 'active' : ''}`} onClick={() => setExpandedDept(isExpanded ? null : dept.id)}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '16px' }}>📍</span>
+                        <span style={{ fontSize: '13px', fontWeight: '800', color: dept.text }}>{dept.name}</span>
+                      </div>
+                      <span style={{ fontSize: '11px', fontWeight: '800', padding: '2px 8px', borderRadius: '8px', background: `${dept.accent}18`, color: dept.accent }}>
+                        {deptTasks.length}
+                      </span>
+                    </div>
+
+                    {isExpanded && (
+                      <div style={{ marginTop: '12px', borderTop: '1px solid var(--border-light)', paddingTop: '8px' }} onClick={e => e.stopPropagation()}>
+                        {deptTasks.map(task => {
+                          globalIdx++;
+                          const isFocused = focusedTaskId === task.id;
+                          return (
+                            <div 
+                              key={task.id} 
+                              className={`summary-task-item ${isFocused ? 'active' : ''}`}
+                              onClick={() => toggleFocus(task.id)}
+                              style={{ 
+                                display: 'flex', gap: '8px',
+                                background: isFocused ? 'var(--primary-pastel)' : 'transparent',
+                                color: isFocused ? 'var(--primary-accent)' : 'inherit',
+                                borderColor: isFocused ? 'var(--primary-accent)' : 'transparent'
+                              }}
+                            >
+                              <span style={{ opacity: 0.6 }}>{globalIdx}.</span>
+                              <span style={{ flex: 1 }}>{task.title}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              });
+            })()}
           </div>
         </div>
       </div>

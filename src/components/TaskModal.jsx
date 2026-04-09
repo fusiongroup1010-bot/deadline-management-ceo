@@ -53,9 +53,13 @@ const TaskModal = () => {
         duration:   currentEvent.duration   || 1,
       });
     } else {
-      setForm({ ...defaultForm, location: activeLocation });
+      // Default to activeLocation if editable, else first editable location
+      const defaultLoc = currentUser?.editableLocations?.includes(activeLocation) 
+        ? activeLocation 
+        : (currentUser?.editableLocations?.[0] || 'hanoi');
+      setForm({ ...defaultForm, location: defaultLoc });
     }
-  }, [currentEvent, isModalOpen, activeLocation]);
+  }, [currentEvent, isModalOpen, activeLocation, currentUser]);
 
   if (!isModalOpen) return null;
 

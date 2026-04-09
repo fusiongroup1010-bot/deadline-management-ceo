@@ -161,6 +161,7 @@ const TaskCard = ({ task, index, onEdit, onDelete, onStatusChange, canEdit }) =>
             color: task.status === 'done' ? 'var(--text-muted)' : 'var(--text-primary)',
             marginTop: '10px', marginBottom: '10px',
             textDecoration: task.status === 'done' ? 'line-through' : 'none',
+            textAlign: task.status === 'in-progress' ? 'right' : 'left'
           }}>
             {task.title}
           </div>
@@ -203,7 +204,21 @@ const TaskCard = ({ task, index, onEdit, onDelete, onStatusChange, canEdit }) =>
           </div>
           
           {/* Tracking info */}
-          {task.updatedBy && (
+          {task.status === 'in-progress' ? (
+            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '6px', marginTop: '12px', paddingTop: '10px', borderTop: '1px solid var(--border-light)' }}>
+              {task.updatedBy && (
+                 <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: '700' }}>
+                   Edit by <strong>{task.updatedBy}</strong>
+                 </div>
+              )}
+              <div style={{
+                backgroundColor: '#2563eb', color: '#ffffff', fontSize: '10px', fontWeight: '800',
+                padding: '2px 8px', borderRadius: '6px', whiteSpace: 'nowrap'
+              }}>
+                In progress
+              </div>
+            </div>
+          ) : task.updatedBy && (
             <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid var(--border-light)', fontSize: '10px', color: 'var(--text-muted)', fontWeight: '600' }}>
               Edited by <strong style={{ color: 'var(--text-secondary)' }}>{task.updatedBy}</strong> at {task.updatedAt ? formatFns(new Date(task.updatedAt), 'HH:mm dd/MM') : ''}
             </div>

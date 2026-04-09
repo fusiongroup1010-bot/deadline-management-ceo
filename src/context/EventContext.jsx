@@ -15,6 +15,7 @@ export const DEPARTMENTS = {
   ],
   hcm: [
     { id: 'hcm-bm', name: 'Branch Manager', color: '#dbeafe', text: '#1e40af', accent: '#3b82f6' },
+    { id: 'hcm-soff', name: 'Sale Offline', color: '#ffedd5', text: '#9a3412', accent: '#f97316' },
     { id: 'hcm-log', name: 'Logistics', color: '#f1f5f9', text: '#334155', accent: '#64748b' },
     { id: 'hcm-sonl', name: 'Sale Online', color: '#fce7f3', text: '#9d174d', accent: '#ec4899' },
     { id: 'hcm-hr', name: 'HR', color: '#fae8ff', text: '#86198f', accent: '#d946ef' },
@@ -28,6 +29,9 @@ export const DEPARTMENTS = {
     { id: 'hy-qc', name: 'QC', color: '#f1f5f9', text: '#334155', accent: '#64748b' },
     { id: 'hy-ds', name: 'Designer', color: '#fce7f3', text: '#9d174d', accent: '#ec4899' },
     { id: 'hy-evo', name: 'Evolution', color: '#ecfdf5', text: '#065f46', accent: '#10b981' },
+    { id: 'hy-pm', name: 'Purchasing Material', color: '#ccfbf1', text: '#115e59', accent: '#14b8a6' },
+    { id: 'hy-pp', name: 'Purchasing Production', color: '#ffedd5', text: '#9a3412', accent: '#f97316' },
+    { id: 'hy-log', name: 'Logistics', color: '#e0e7ff', text: '#3730a3', accent: '#6366f1' },
   ]
 };
 
@@ -53,7 +57,34 @@ import { useAuth } from './AuthContext';
 export const EventContext = createContext();
 
 export const EventProvider = ({ children }) => {
-  const [items, setItems] = useState([]); // Real-time sync
+  const loadMergedState = (fbData) => {
+    const fallbackFbStr = localStorage.getItem('last_known_fb_data_ceo');
+    let baseData = fbData;
+    
+    if (!baseData && fallbackFbStr) {
+        baseData = JSON.parse(fallbackFbStr);
+    } else if (!baseData) {
+        baseData = [];
+    } else {
+        localStorage.setItem('last_known_fb_data_ceo', JSON.stringify(fbData));
+    }
+
+    const localStr = localStorage.getItem('local_changes_ceo');
+    const localChanges = localStr ? JSON.parse(localStr) : {};
+    
+    const dataMap = {};
+    baseData.forEach(i => dataMap[i.id] = i);
+    
+    Object.keys(localChanges).forEach(id => {
+      const change = localChanges[id];
+      if (change === null) delete dataMap[id];
+      else dataMap[id] = change;
+    });
+    
+    return Object.values(dataMap);
+  };
+
+  const [items, setItems] = useState(() => loadMergedState(null)); // Initialize robustly!
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(null);
   const { currentUser } = useAuth();
@@ -62,7 +93,6 @@ export const EventProvider = ({ children }) => {
   // Auto-set location based on user permissions on login
   useEffect(() => {
     if (currentUser && currentUser.allowedLocations) {
-      // If current activeLocation isn't allowed for this user, switch to the first allowed one
       if (!currentUser.allowedLocations.includes(activeLocation)) {
         setActiveLocation(currentUser.allowedLocations[0]);
       }
@@ -134,41 +164,120 @@ export const EventProvider = ({ children }) => {
     root.style.setProperty('--location-banner-bg', t.bannerBg);
   }, [activeLocation]);
 
+  const saveChangeLocal = (id, objOrNull) => {
+    const localStr = localStorage.getItem('local_changes_ceo');
+    const localChanges = localStr ? JSON.parse(localStr) : {};
+    localChanges[id] = objOrNull;
+    localStorage.setItem('local_changes_ceo', JSON.stringify(localChanges));
+    
+    setItems(prev => {
+      if (objOrNull === null) return prev.filter(i => i.id !== id);
+      if (prev.find(i => i.id === id)) return prev.map(i => i.id === id ? objOrNull : i);
+      return [...prev, objOrNull];
+    });
+  };
+
+  const clearChangeLocal = (id) => {
+    const localStr = localStorage.getItem('local_changes_ceo');
+    const localChanges = localStr ? JSON.parse(localStr) : {};
+    if (id in localChanges) {
+      delete localChanges[id];
+      localStorage.setItem('local_changes_ceo', JSON.stringify(localChanges));
+    }
+  };
+
+  const syncPendingChangesToCloud = () => {
+    const localStr = localStorage.getItem('local_changes_ceo');
+    if (!localStr) return;
+    const localChanges = JSON.parse(localStr);
+    const keys = Object.keys(localChanges);
+    if (keys.length === 0) return;
+
+    keys.forEach(id => {
+      const change = localChanges[id];
+      clearChangeLocal(id);
+      
+      if (change === null) {
+        deleteDoc(doc(db, 'deadline_items_ceo', id)).catch(e => saveChangeLocal(id, null));
+      } else {
+        setDoc(doc(db, 'deadline_items_ceo', id), change, { merge: true }).catch(e => saveChangeLocal(id, change));
+      }
+    });
+  };
+
   // Sync with Firestore
   useEffect(() => {
     const q = query(collection(db, 'deadline_items_ceo'), orderBy('dueDate', 'asc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map(d => ({ ...d.data(), id: d.id }));
-      setItems(data);
-    });
+    const unsubscribe = onSnapshot(q, 
+      (snapshot) => {
+        const fbData = snapshot.docs.map(d => ({ ...d.data(), id: d.id }));
+        setItems(loadMergedState(fbData));
+        syncPendingChangesToCloud();
+      },
+      (error) => {
+        console.warn("Firestore sync failed. Offline mode active.", error);
+        setItems(loadMergedState(null));
+      }
+    );
     return () => unsubscribe();
   }, []);
 
-  /* ── CRUD (Firestore) ── */
+  /* ── CRUD (Firestore with robust local overrides) ── */
   const addEvent = async (item) => {
     const newId = `item-${Date.now()}`;
-    await setDoc(doc(db, 'deadline_items_ceo', newId), { ...item, id: newId });
+    const newItem = { ...item, id: newId };
+    saveChangeLocal(newId, newItem);
     setIsModalOpen(false);
+    try { 
+      await setDoc(doc(db, 'deadline_items_ceo', newId), newItem); 
+      clearChangeLocal(newId);
+    } catch (e) { console.warn(e); }
   };
 
   const updateEvent = async (updated) => {
-    await setDoc(doc(db, 'deadline_items_ceo', updated.id), updated, { merge: true });
+    saveChangeLocal(updated.id, updated);
     setIsModalOpen(false);
     setCurrentEvent(null);
+    try { 
+      await setDoc(doc(db, 'deadline_items_ceo', updated.id), updated, { merge: true }); 
+      clearChangeLocal(updated.id);
+    } catch (e) { console.warn(e); }
   };
 
   const deleteEvent = async (id) => {
-    await deleteDoc(doc(db, 'deadline_items_ceo', id));
+    saveChangeLocal(id, null);
     setIsModalOpen(false);
     setCurrentEvent(null);
+    try { 
+      await deleteDoc(doc(db, 'deadline_items_ceo', id)); 
+      clearChangeLocal(id);
+    } catch (e) { console.warn(e); }
   };
 
   const changeStatus = async (id, status) => {
-    await setDoc(doc(db, 'deadline_items_ceo', id), { 
-      status,
-      updatedBy: currentUser ? currentUser.name : 'Unknown',
-      updatedAt: new Date().toISOString()
-    }, { merge: true });
+    setItems((prev) => {
+      const target = prev.find(i => i.id === id);
+      if (!target) return prev;
+      const upd = { 
+        ...target, status, 
+        updatedBy: currentUser ? currentUser.name : 'Unknown', 
+        updatedAt: new Date().toISOString() 
+      };
+      
+      // Async save to pending queue
+      Promise.resolve().then(() => {
+        const localStr = localStorage.getItem('local_changes_ceo');
+        const localChanges = localStr ? JSON.parse(localStr) : {};
+        localChanges[id] = upd;
+        localStorage.setItem('local_changes_ceo', JSON.stringify(localChanges));
+      });
+      
+      setDoc(doc(db, 'deadline_items_ceo', id), upd, { merge: true })
+        .then(() => clearChangeLocal(id))
+        .catch(console.warn);
+
+      return prev.map(i => i.id === id ? upd : i);
+    });
   };
 
   /* ── Modal triggers ── */
