@@ -58,30 +58,42 @@ export const EventContext = createContext();
 
 export const EventProvider = ({ children }) => {
   const loadMergedState = (fbData) => {
-    const fallbackFbStr = localStorage.getItem('last_known_fb_data_ceo');
-    let baseData = fbData;
-    
-    if (!baseData && fallbackFbStr) {
-        baseData = JSON.parse(fallbackFbStr);
-    } else if (!baseData) {
-        baseData = [];
-    } else {
-        localStorage.setItem('last_known_fb_data_ceo', JSON.stringify(fbData));
-    }
+    try {
+      const fallbackFbStr = localStorage.getItem('last_known_fb_data_ceo');
+      let baseData = fbData;
+      
+      if (!baseData && fallbackFbStr) {
+          try { baseData = JSON.parse(fallbackFbStr); } catch(e) { baseData = []; }
+      } else if (!baseData) {
+          baseData = [];
+      } else {
+          localStorage.setItem('last_known_fb_data_ceo', JSON.stringify(fbData));
+      }
 
-    const localStr = localStorage.getItem('local_changes_ceo');
-    const localChanges = localStr ? JSON.parse(localStr) : {};
-    
-    const dataMap = {};
-    baseData.forEach(i => dataMap[i.id] = i);
-    
-    Object.keys(localChanges).forEach(id => {
-      const change = localChanges[id];
-      if (change === null) delete dataMap[id];
-      else dataMap[id] = change;
-    });
-    
-    return Object.values(dataMap);
+      const localStr = localStorage.getItem('local_changes_ceo');
+      let localChanges = {};
+      try {
+        localChanges = localStr ? JSON.parse(localStr) : {};
+      } catch(e) {
+        localChanges = {};
+      }
+      
+      const dataMap = {};
+      (baseData || []).forEach(i => {
+        if (i && i.id) dataMap[i.id] = i;
+      });
+      
+      Object.keys(localChanges).forEach(id => {
+        const change = localChanges[id];
+        if (change === null) delete dataMap[id];
+        else if (change && typeof change === 'object') dataMap[id] = change;
+      });
+      
+      return Object.values(dataMap);
+    } catch (e) {
+      console.error("Critical error in loadMergedState:", e);
+      return [];
+    }
   };
 
   const [items, setItems] = useState(() => loadMergedState(null)); // Initialize robustly!
@@ -189,7 +201,12 @@ export const EventProvider = ({ children }) => {
   const syncPendingChangesToCloud = () => {
     const localStr = localStorage.getItem('local_changes_ceo');
     if (!localStr) return;
-    const localChanges = JSON.parse(localStr);
+    let localChanges = {};
+    try {
+      localChanges = JSON.parse(localStr);
+    } catch(e) {
+      return;
+    }
     const keys = Object.keys(localChanges);
     if (keys.length === 0) return;
 
