@@ -74,7 +74,8 @@ const Dashboard = () => {
   const inProgress = items.filter(t => t.status === 'in-progress');
   const overdue    = items.filter(t => {
     if (t.status === 'done') return false;
-    const due = new Date(`${t.dueDate}${t.dueTime ? 'T' + t.dueTime : 'T23:59'}`);
+    const checkDate = t.endDate || t.dueDate;
+    const due = new Date(`${checkDate}${t.dueTime ? 'T' + t.dueTime : 'T23:59'}`);
     return due < new Date();
   });
 

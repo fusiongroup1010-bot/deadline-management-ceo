@@ -37,7 +37,8 @@ const formatDate = (d, end) => {
 
 const isOverdue = (task) => {
   if (task.status === 'done') return false;
-  const due = new Date(`${task.dueDate}${task.dueTime ? 'T' + task.dueTime : 'T23:59'}`);
+  const checkDate = task.endDate || task.dueDate;
+  const due = new Date(`${checkDate}${task.dueTime ? 'T' + task.dueTime : 'T23:59'}`);
   return due < new Date();
 };
 
