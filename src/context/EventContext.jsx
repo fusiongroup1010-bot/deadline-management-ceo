@@ -5,7 +5,7 @@ export const DEPARTMENTS = {
   hanoi: [
     { id: 'hn-bm', name: 'Branch Manager', color: '#dbeafe', text: '#1e40af', accent: '#3b82f6' },
     { id: 'hn-soff', name: 'Sale Offline', color: '#ffedd5', text: '#9a3412', accent: '#f97316' },
-    { id: 'hn-sadmin', name: 'Sale Admin', color: '#fef9c3', text: '#854d0e', accent: '#eab308' },
+    { id: 'hn-sadmin', name: 'Sale Operation', color: '#fef9c3', text: '#854d0e', accent: '#eab308' },
     { id: 'hn-acc', name: 'Accountant', color: '#dcfce7', text: '#166534', accent: '#22c55e' },
     { id: 'hn-sonl', name: 'Sale Online', color: '#fce7f3', text: '#9d174d', accent: '#ec4899' },
     { id: 'hn-mkt', name: 'MKT', color: '#e0f2fe', text: '#075985', accent: '#0ea5e9' },
@@ -27,7 +27,7 @@ export const DEPARTMENTS = {
     { id: 'hy-hr', name: 'HR', color: '#fae8ff', text: '#86198f', accent: '#d946ef' },
     { id: 'hy-ac', name: 'Accountant', color: '#fef3c7', text: '#92400e', accent: '#d97706' },
     { id: 'hy-qc', name: 'QC', color: '#f1f5f9', text: '#334155', accent: '#64748b' },
-    { id: 'hy-ds', name: 'Designer', color: '#fce7f3', text: '#9d174d', accent: '#ec4899' },
+    { id: 'hy-ds', name: 'Design', color: '#fce7f3', text: '#9d174d', accent: '#ec4899' },
     { id: 'hy-evo', name: 'Evolution', color: '#ecfdf5', text: '#065f46', accent: '#10b981' },
     { id: 'hy-pm', name: 'Purchasing Material', color: '#ccfbf1', text: '#115e59', accent: '#14b8a6' },
     { id: 'hy-pp', name: 'Purchasing Production', color: '#ffedd5', text: '#9a3412', accent: '#f97316' },

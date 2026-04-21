@@ -364,8 +364,14 @@ const TaskBoard = () => {
   const { currentUser } = useAuth();
   const canEdit = isEditable;
 
-  // Show all items
-  const items = [...allItems].sort((a, b) => (a.dueDate || '').localeCompare(b.dueDate || ''));
+  // Filter items based on user permissions for Planner Board
+  const items = [...allItems].filter(item => {
+    if (!currentUser || currentUser.allowedCategoryIds === 'all') return true;
+    if (Array.isArray(currentUser.allowedCategoryIds)) {
+      return currentUser.allowedCategoryIds.includes(item.categoryId);
+    }
+    return true;
+  }).sort((a, b) => (a.dueDate || '').localeCompare(b.dueDate || ''));
 
   const onDragEnd = ({ destination, source, draggableId }) => {
     if (!destination) return;
