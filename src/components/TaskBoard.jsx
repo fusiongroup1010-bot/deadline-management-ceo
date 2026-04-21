@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { useNavigate } from 'react-router-dom';
 import {
   MoreHorizontal, Edit2, Trash2, Plus, Calendar, Clock,
   Flag, Users, FileText, Tag, ChevronDown, ChevronRight,
@@ -46,6 +47,7 @@ const isDueToday = (task) => task.dueDate === today();
 
 /* ────────── Task Card ────────── */
 const TaskCard = ({ task, index, onEdit, onDelete, onStatusChange, canEdit }) => {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const TypeIcon = TYPE_CONFIG[task.type]?.icon || Tag;
@@ -64,6 +66,11 @@ const TaskCard = ({ task, index, onEdit, onDelete, onStatusChange, canEdit }) =>
           {...provided.dragHandleProps}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => { setIsHovered(false); setMenuOpen(false); }}
+          onClick={() => {
+            if (task.dueDate) {
+              navigate('/calendar', { state: { goToDate: task.dueDate, highlightId: task.id } });
+            }
+          }}
           style={{
             ...provided.draggableProps.style,
             background: snapshot.isDragging ? '#ffffff' : 'var(--bg-panel)',
@@ -72,6 +79,7 @@ const TaskCard = ({ task, index, onEdit, onDelete, onStatusChange, canEdit }) =>
             border: overdue ? '1px solid #fecaca' : '1px solid var(--border-light)',
             opacity: snapshot.isDragging ? 0.95 : 1,
             position: 'relative', transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+            cursor: 'pointer'
           }}
         >
           {/* Overdue / today indicator */}

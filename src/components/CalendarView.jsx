@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Users, MoreHorizontal, Edit2, Trash2, ChevronLeft } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { format, startOfWeek, addDays, isSameDay, differenceInCalendarDays } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { DayPicker } from 'react-day-picker';
@@ -195,6 +196,7 @@ const EventCard = ({ event, topPos, height, leftPos, width, onEdit, onDelete, on
 /* ── Main CalendarView ── */
 const CalendarView = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const location = useLocation();
   const { events, openEditModal, deleteEvent, updateEvent, openAddModal, activeLocation, isEditable } = useEvents();
   const { currentUser } = useAuth();
   const canEdit = isEditable;
@@ -226,6 +228,22 @@ const CalendarView = () => {
   useEffect(() => {
     setActiveCategories(Object.fromEntries(currentDepts.map(c => [c.id, true])));
   }, [activeLocation]);
+
+  // Handle link from Planner Board
+  useEffect(() => {
+    if (location.state?.goToDate) {
+      const d = new Date(location.state.goToDate + 'T00:00:00');
+      setSelectedDate(d);
+      
+      if (location.state.highlightId) {
+        // Wait for render
+        setTimeout(() => {
+          scrollToTask(location.state.highlightId);
+          setFocusedTaskId(location.state.highlightId);
+        }, 300);
+      }
+    }
+  }, [location.state]);
 
   const toggleCat = (id) => setActiveCategories(p => ({ ...p, [id]: !p[id] }));
 
