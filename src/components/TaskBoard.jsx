@@ -67,10 +67,11 @@ const TaskCard = ({ task, index, onEdit, onDelete, onStatusChange, canEdit }) =>
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => { setIsHovered(false); setMenuOpen(false); }}
           onClick={() => {
-            if (task.dueDate) {
-              navigate('/calendar', { state: { goToDate: task.dueDate, highlightId: task.id } });
-            }
+            const dateToUse = task.dueDate || new Date().toISOString().split('T')[0];
+            navigate('/calendar', { state: { goToDate: dateToUse, highlightId: task.id } });
           }}
+          role="button"
+          tabIndex={0}
           style={{
             ...provided.draggableProps.style,
             background: snapshot.isDragging ? '#ffffff' : 'var(--bg-panel)',
@@ -79,7 +80,8 @@ const TaskCard = ({ task, index, onEdit, onDelete, onStatusChange, canEdit }) =>
             border: overdue ? '1px solid #fecaca' : '1px solid var(--border-light)',
             opacity: snapshot.isDragging ? 0.95 : 1,
             position: 'relative', transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            outline: 'none'
           }}
         >
           {/* Overdue / today indicator */}
