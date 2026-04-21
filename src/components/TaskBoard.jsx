@@ -66,18 +66,10 @@ const TaskCard = ({ task, index, onEdit, onDelete, onStatusChange, canEdit }) =>
           {...provided.dragHandleProps}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => { setIsHovered(false); setMenuOpen(false); }}
-          onClick={() => {
-            const todayStr = new Date().toISOString().split('T')[0];
-            const dateToUse = (task.dueDate && task.dueDate.trim() !== '') ? task.dueDate : todayStr;
-            console.log('Navigating to calendar with date:', dateToUse, 'for task:', task.id);
-            navigate('/calendar', { state: { goToDate: dateToUse, highlightId: task.id } });
-          }}
-          role="button"
-          tabIndex={0}
           style={{
             ...provided.draggableProps.style,
             background: snapshot.isDragging ? '#ffffff' : 'var(--bg-panel)',
-            borderRadius: '16px', padding: '16px', marginBottom: '10px',
+            borderRadius: '16px', padding: '0', marginBottom: '10px',
             boxShadow: snapshot.isDragging ? '0 20px 40px rgba(0,0,0,0.12)' : 'var(--shadow-soft)',
             border: overdue ? '1px solid #fecaca' : '1px solid var(--border-light)',
             opacity: snapshot.isDragging ? 0.95 : 1,
@@ -86,33 +78,42 @@ const TaskCard = ({ task, index, onEdit, onDelete, onStatusChange, canEdit }) =>
             outline: 'none'
           }}
         >
-          {/* Overdue / today indicator */}
-          {(overdue || dueToday) && task.status !== 'done' && (
-            <div style={{
-              position: 'absolute', top: 0, left: 0, width: '4px', height: '100%',
-              borderRadius: '16px 0 0 16px',
-              background: overdue ? '#ef4444' : '#f59e0b',
-            }} />
-          )}
+          <div 
+            onClick={() => {
+              const todayStr = new Date().toISOString().split('T')[0];
+              const dateToUse = (task.dueDate && typeof task.dueDate === 'string' && task.dueDate.trim() !== '') ? task.dueDate : todayStr;
+              console.log('TaskCard: Clicked! Navigating to:', dateToUse);
+              navigate('/calendar', { state: { goToDate: dateToUse, highlightId: task.id } });
+            }}
+            style={{ padding: '16px', width: '100%', height: '100%' }}
+          >
+            {/* Overdue / today indicator */}
+            {(overdue || dueToday) && task.status !== 'done' && (
+              <div style={{
+                position: 'absolute', top: 0, left: 0, width: '4px', height: '100%',
+                borderRadius: '16px 0 0 16px',
+                background: overdue ? '#ef4444' : '#f59e0b',
+              }} />
+            )}
 
-          {/* Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginLeft: (overdue || dueToday) && task.status !== 'done' ? '4px' : 0 }}>
-            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-              <span style={{
-                display: 'inline-flex', alignItems: 'center', gap: '4px',
-                fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px',
-                color: typeCfg.color, background: typeCfg.bg, padding: '3px 8px', borderRadius: '8px',
-              }}>
-                <TypeIcon size={11} />{typeCfg.label}
-              </span>
-              <span style={{
-                display: 'inline-flex', alignItems: 'center', gap: '4px',
-                fontSize: '11px', fontWeight: '700', color: priCfg.color, background: priCfg.bg,
-                padding: '3px 8px', borderRadius: '8px',
-              }}>
-                <Flag size={10} />{priCfg.label}
-              </span>
-            </div>
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginLeft: (overdue || dueToday) && task.status !== 'done' ? '4px' : 0 }}>
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '4px',
+                  fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px',
+                  color: typeCfg.color, background: typeCfg.bg, padding: '3px 8px', borderRadius: '8px',
+                }}>
+                  <TypeIcon size={11} />{typeCfg.label}
+                </span>
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '4px',
+                  fontSize: '11px', fontWeight: '700', color: priCfg.color, background: priCfg.bg,
+                  padding: '3px 8px', borderRadius: '8px',
+                }}>
+                  <Flag size={10} />{priCfg.label}
+                </span>
+              </div>
 
             {/* ... menu restrictions */}
             {canEdit && (
@@ -236,6 +237,7 @@ const TaskCard = ({ task, index, onEdit, onDelete, onStatusChange, canEdit }) =>
               Edited by <strong style={{ color: 'var(--text-secondary)' }}>{task.updatedBy}</strong> at {task.updatedAt ? formatFns(new Date(task.updatedAt), 'HH:mm dd/MM') : ''}
             </div>
           )}
+          </div>
         </div>
       )}
     </Draggable>
