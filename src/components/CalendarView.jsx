@@ -232,15 +232,17 @@ const CalendarView = () => {
   // Handle link from Planner Board
   useEffect(() => {
     if (location.state?.goToDate) {
+      console.log('CalendarView: received navigation to date:', location.state.goToDate, 'highlight:', location.state.highlightId);
       const d = new Date(location.state.goToDate + 'T00:00:00');
       setSelectedDate(d);
       
       if (location.state.highlightId) {
         // Wait for render
         setTimeout(() => {
+          console.log('CalendarView: scrolling to task:', location.state.highlightId);
           scrollToTask(location.state.highlightId);
           setFocusedTaskId(location.state.highlightId);
-        }, 300);
+        }, 500);
       }
     }
   }, [location.state]);

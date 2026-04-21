@@ -67,7 +67,9 @@ const TaskCard = ({ task, index, onEdit, onDelete, onStatusChange, canEdit }) =>
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => { setIsHovered(false); setMenuOpen(false); }}
           onClick={() => {
-            const dateToUse = task.dueDate || new Date().toISOString().split('T')[0];
+            const todayStr = new Date().toISOString().split('T')[0];
+            const dateToUse = (task.dueDate && task.dueDate.trim() !== '') ? task.dueDate : todayStr;
+            console.log('Navigating to calendar with date:', dateToUse, 'for task:', task.id);
             navigate('/calendar', { state: { goToDate: dateToUse, highlightId: task.id } });
           }}
           role="button"
