@@ -237,6 +237,12 @@ const CalendarView = () => {
       setSelectedDate(d);
       
       if (location.state.highlightId) {
+        // Ensure the category is active if we know the task
+        const task = events.find(e => e.id === location.state.highlightId);
+        if (task && !activeCategories[task.categoryId]) {
+          setActiveCategories(prev => ({ ...prev, [task.categoryId]: true }));
+        }
+
         // Wait for render
         setTimeout(() => {
           console.log('CalendarView: scrolling to task:', location.state.highlightId);
@@ -245,7 +251,7 @@ const CalendarView = () => {
         }, 500);
       }
     }
-  }, [location.state]);
+  }, [location.state, events]);
 
   const toggleCat = (id) => setActiveCategories(p => ({ ...p, [id]: !p[id] }));
 

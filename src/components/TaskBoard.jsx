@@ -182,33 +182,41 @@ const TaskCard = ({ task, index, onEdit, onDelete, onStatusChange, canEdit }) =>
 
           {/* Footer */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            {overdue && task.status !== 'done' ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: '700', color: '#ef4444' }}>
-                <AlertTriangle size={12} /> Overdue · {formatDate(task.dueDate, task.endDate)}
-              </span>
-            ) : dueToday && task.status !== 'done' ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: '700', color: '#f59e0b' }}>
-                <Clock size={12} /> Today{task.dueTime ? ` · ${(() => {
-                  if (!task.duration) return task.dueTime;
-                  const [h, m] = task.dueTime.split(':').map(Number);
-                  const endNum = h + m / 60 + task.duration;
-                  const h2 = Math.floor(endNum) % 24;
-                  const m2 = Math.round((endNum - Math.floor(endNum)) * 60);
-                  return `${task.dueTime} - ${h2.toString().padStart(2, '0')}:${m2.toString().padStart(2, '0')}`;
-                })()}` : ''}
-              </span>
-            ) : (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>
-                <Calendar size={12} /> {formatDate(task.dueDate, task.endDate)}{task.dueTime ? ` · ${(() => {
-                  if (!task.duration) return task.dueTime;
-                  const [h, m] = task.dueTime.split(':').map(Number);
-                  const endNum = h + m / 60 + task.duration;
-                  const h2 = Math.floor(endNum) % 24;
-                  const m2 = Math.round((endNum - Math.floor(endNum)) * 60);
-                  return `${task.dueTime} - ${h2.toString().padStart(2, '0')}:${m2.toString().padStart(2, '0')}`;
-                })()}` : ''}
-              </span>
-            )}
+            {(() => {
+              // Build time string
+              const timeStr = task.dueTime ? ` · ${(() => {
+                if (!task.duration) return task.dueTime;
+                const [h, m] = task.dueTime.split(':').map(Number);
+                const endNum = h + m / 60 + task.duration;
+                const h2 = Math.floor(endNum) % 24;
+                const m2 = Math.round((endNum - Math.floor(endNum)) * 60);
+                return `${task.dueTime} - ${h2.toString().padStart(2, '0')}:${m2.toString().padStart(2, '0')}`;
+              })()}` : '';
+
+              // Always show date range if endDate differs from dueDate
+              const hasRange = task.endDate && task.endDate !== task.dueDate;
+              const dateStr = hasRange ? formatDate(task.dueDate, task.endDate) : formatDate(task.dueDate);
+
+              if (overdue && task.status !== 'done') {
+                return (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: '700', color: '#ef4444' }}>
+                    <AlertTriangle size={12} /> Overdue · {dateStr}{timeStr}
+                  </span>
+                );
+              }
+              if (dueToday && task.status !== 'done' && !hasRange) {
+                return (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: '700', color: '#f59e0b' }}>
+                    <Clock size={12} /> Today{timeStr}
+                  </span>
+                );
+              }
+              return (
+                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: '600', color: dueToday && task.status !== 'done' ? '#f59e0b' : 'var(--text-secondary)' }}>
+                  <Calendar size={12} /> {dateStr}{timeStr}
+                </span>
+              );
+            })()}
 
             {catCfg && (
               <span style={{ fontSize: '11px', fontWeight: '700', padding: '2px 8px', borderRadius: '8px', color: catCfg.accent, background: `${catCfg.accent}18` }}>

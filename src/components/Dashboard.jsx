@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useEvents, CATEGORY_MAP } from '../context/EventContext';
 import { useAuth } from '../context/AuthContext';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 import { enUS } from 'date-fns/locale';
 
 const today = () => new Date().toISOString().split('T')[0];
@@ -32,6 +33,7 @@ const formatDate = (d, end) => {
 const Dashboard = () => {
   const { filteredItems: items, openEditModal, activeLocation } = useEvents();
   const { currentUser } = useAuth();
+  const navigate = useNavigate();
   const tday = today();
 
   // Location-aware banner config
@@ -235,7 +237,11 @@ const Dashboard = () => {
                 return (
                   <div
                     key={item.id}
-                    onClick={() => openEditModal(item)}
+                    onClick={() => {
+                      const todayStr = new Date().toISOString().split('T')[0];
+                      const dateToUse = item.dueDate || todayStr;
+                      navigate('/calendar', { state: { goToDate: dateToUse, highlightId: item.id } });
+                    }}
                     style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '14px 16px', background: 'var(--bg-panel-hover)', borderRadius: 'var(--radius-md)', cursor: 'pointer', transition: 'background 0.15s' }}
                     onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-main)'}
                     onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-panel-hover)'}
@@ -288,7 +294,11 @@ const Dashboard = () => {
                 const catColor = getCatColor(item.categoryId);
                 const isOv = item.dueDate < tday;
                 return (
-                  <div key={item.id} onClick={() => openEditModal(item)} style={{ display: 'flex', gap: '20px', position: 'relative', zIndex: 1, cursor: 'pointer' }}>
+                  <div key={item.id} onClick={() => {
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    const dateToUse = item.dueDate || todayStr;
+                    navigate('/calendar', { state: { goToDate: dateToUse, highlightId: item.id } });
+                  }} style={{ display: 'flex', gap: '20px', position: 'relative', zIndex: 1, cursor: 'pointer' }}>
                     <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: isOv ? '#fee2e2' : `${catColor}20`, border: '2px solid #ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', flexShrink: 0 }}>
                       <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: isOv ? '#ef4444' : catColor }} />
                     </div>
