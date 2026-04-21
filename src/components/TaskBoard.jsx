@@ -364,24 +364,8 @@ const TaskBoard = () => {
   const { currentUser } = useAuth();
   const canEdit = isEditable;
 
-  // Current Week Filter (Monday to Sunday)
-  const now = new Date();
-  const dayOfWeek = now.getDay();
-  const diffToMon = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-  const startOfWk = new Date(now);
-  startOfWk.setDate(now.getDate() + diffToMon);
-  startOfWk.setHours(0,0,0,0);
-  const endOfWk = new Date(startOfWk);
-  endOfWk.setDate(startOfWk.getDate() + 6);
-  endOfWk.setHours(23,59,59,999);
-
-  const weekRangeStr = `${formatFns(startOfWk, 'dd MMM')} - ${formatFns(endOfWk, 'dd MMM')}`;
-
-  const items = allItems.filter(item => {
-    const d1 = new Date(item.dueDate + 'T00:00:00');
-    const d2 = new Date((item.endDate || item.dueDate) + 'T23:59:59');
-    return d1 <= endOfWk && startOfWk <= d2;
-  });
+  // Show all items
+  const items = [...allItems].sort((a, b) => (a.dueDate || '').localeCompare(b.dueDate || ''));
 
   const onDragEnd = ({ destination, source, draggableId }) => {
     if (!destination) return;
@@ -414,7 +398,7 @@ const TaskBoard = () => {
         <div>
           <h1 style={{ fontSize: '26px', fontWeight: '800', marginBottom: '6px', color: 'var(--text-primary)' }}>Planner Board</h1>
           <p style={{ color: 'var(--text-secondary)', fontWeight: '600', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Calendar size={14} /> Weekly View: {weekRangeStr} · {items.filter(t => t.status !== 'done').length} active tasks
+            <Calendar size={14} /> All Saved Tasks · {items.filter(t => t.status !== 'done').length} active tasks
           </p>
         </div>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
